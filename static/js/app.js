@@ -23,8 +23,8 @@ const FOOTER_QUOTES = [
   "your journal misses your handwriting",
 ];
 
-function rotateFooterQuote() {
-  const el = document.getElementById("footer-quote");
+function rotateHeroQuote() {
+  const el = document.getElementById("hero-quote");
   if (!el) return;
   const idx = Math.floor(Math.random() * FOOTER_QUOTES.length);
   el.style.opacity = 0;
@@ -34,10 +34,10 @@ function rotateFooterQuote() {
   }, 500);
 }
 
-// Rotate quotes every 60 seconds
+// Rotate quotes every 15 seconds
 document.addEventListener("DOMContentLoaded", () => {
-  rotateFooterQuote();
-  setInterval(rotateFooterQuote, 60000);
+  rotateHeroQuote();
+  setInterval(rotateHeroQuote, 15000);
 });
 
 // Character counter for post compose
