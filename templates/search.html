@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}search — ant.social{% endblock %}
+
+{% block content %}
+<h2 class="section-title">search</h2>
+
+<div class="search-box">
+  <form method="get">
+    <input type="text" name="q" value="{{ query }}" placeholder="search users..." autofocus />
+  </form>
+</div>
+
+{% if query %}
+  {% if users %}
+  <ul class="user-list">
+    {% for u in users %}
+    <li class="user-list-item">
+      {% if u.profile.profile_picture %}
+      <img src="{{ u.profile.profile_picture.url }}" alt="" class="post-avatar" />
+      {% else %}
+      <div class="post-avatar-placeholder">{{ u.username.0 }}</div>
+      {% endif %}
+      <div class="user-info">
+        <a href="{% url 'profile' u.username %}" class="display-name">{{ u.profile.display_name }}</a>
+        <span class="username">@{{ u.username }}</span>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="empty-state">
+    <p>no users found. they're probably outside.</p>
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}

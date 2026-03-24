@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}login — ant.social{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h2>login</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="username">username</label>
+      <input type="text" id="username" name="username" required autofocus />
+    </div>
+    <div class="form-group">
+      <label for="password">password</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+    <button type="submit" class="btn btn-primary" style="width: 100%">login</button>
+  </form>
+  <p style="margin-top: 16px; font-size: 13px; color: #888; text-align: center">
+    don't have an account?
+    <a href="{% url 'register' %}" style="font-weight: 600">register</a>
+  </p>
+</div>
+{% endblock %}

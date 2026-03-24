@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "social-media-api"
+version = "0.1.0"
+description = "ant.social - A minimalist anti-social-media platform"
+authors = ["Vinic <vinic@ant.social>"]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"
+django = ">=6.0.1,<7.0.0"
+djangorestframework = ">=3.16.1,<4.0.0"
+psycopg2-binary = "^2.9.10"
+Pillow = ">=11.0.0,<12.0.0"
+
+[tool.poetry.group.dev.dependencies]
+factory-boy = ">=3.3.3,<4.0.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

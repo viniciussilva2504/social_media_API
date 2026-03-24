@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}post — ant.social{% endblock %}
+
+{% block content %}
+<div class="post-card" style="border-bottom: 2px solid #111; padding-bottom: 24px">
+  <div class="post-header">
+    {% if post.author.profile.profile_picture %}
+    <img src="{{ post.author.profile.profile_picture.url }}" alt="" class="post-avatar" />
+    {% else %}
+    <div class="post-avatar-placeholder">{{ post.author.username.0 }}</div>
+    {% endif %}
+    <div class="post-meta">
+      <a href="{% url 'profile' post.author.username %}" class="display-name">{{ post.author.profile.display_name }}</a>
+      <span class="username">@{{ post.author.username }}</span>
+    </div>
+    <span class="post-meta timestamp" style="margin-left: auto">{{ post.created_at|timesince }} ago</span>
+  </div>
+  <div class="post-content" style="font-size: 18px">{{ post.content }}</div>
+  <div class="post-actions">
+    <button data-like-post="{{ post.id }}"
+            class="{% if is_liked %}liked{% endif %}">
+      ♥ <span class="like-count">{{ post.likes_count }}</span>
+    </button>
+    <span>✎ {{ post.comments_count }}</span>
+  </div>
+</div>
+
+<div style="margin-top: 24px">
+  <h3 class="section-title">comments</h3>
+
+  <form method="post" style="margin-bottom: 24px">
+    {% csrf_token %}
+    <div class="form-group">
+      <textarea name="content" maxlength="280" placeholder="add a comment..." rows="2"
+                style="width: 100%; padding: 12px; border: 2px solid #ddd; font-size: 14px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;"></textarea>
+    </div>
+    <button type="submit" class="btn btn-small">comment</button>
+  </form>
+
+  {% if comments %}
+    {% for comment in comments %}
+    <div class="comment">
+      <div class="comment-header">
+        <a href="{% url 'profile' comment.author.username %}" style="font-weight: 700; font-size: 13px">{{ comment.author.profile.display_name }}</a>
+        <span style="color: #888; font-size: 12px">@{{ comment.author.username }} · {{ comment.created_at|timesince }} ago</span>
+      </div>
+      <div class="comment-content">{{ comment.content }}</div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state" style="padding: 32px">
+      <p>no comments yet. be the first (or don't).</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

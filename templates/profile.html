@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}@{{ profile_user.username }} — ant.social{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+  {% if profile.profile_picture %}
+  <img src="{{ profile.profile_picture.url }}" alt="" class="profile-picture-large" />
+  {% else %}
+  <div class="profile-picture-placeholder-large">
+    {{ profile_user.username.0 }}
+  </div>
+  {% endif %}
+  <h1>{{ profile.display_name }}</h1>
+  <p class="username-display">@{{ profile_user.username }}</p>
+  {% if profile.bio %}
+  <p class="bio">{{ profile.bio }}</p>
+  {% endif %}
+
+  <div class="profile-stats">
+    <a href="{% url 'followers' profile_user.username %}"><span class="count">{{ profile.followers_count }}</span> followers</a>
+    <a href="{% url 'following' profile_user.username %}"><span class="count">{{ profile.following_count }}</span> following</a>
+    <span><span class="count">{{ posts.count }}</span> posts</span>
+  </div>
+
+  <div class="profile-actions">
+    {% if is_own_profile %}
+    <a href="{% url 'edit_profile' profile_user.username %}" class="btn btn-small">edit profile</a>
+    {% else %}
+    <button data-follow-user="{{ profile_user.username }}"
+            class="btn btn-small {% if is_following %}{% else %}btn-primary{% endif %}">
+      {% if is_following %}unfollow{% else %}follow{% endif %}
+    </button>
+    {% endif %}
+  </div>
+</div>
+
+<h3 class="section-title">posts</h3>
+
+{% if posts %}
+  {% for post in posts %}
+  <div class="post-card">
+    <a href="{% url 'post_detail' post.id %}" style="color: inherit">
+      <div class="post-content">{{ post.content }}</div>
+    </a>
+    <div class="post-actions">
+      <span>♥ {{ post.likes_count }}</span>
+      <a href="{% url 'post_detail' post.id %}">✎ {{ post.comments_count }}</a>
+      <span class="timestamp">{{ post.created_at|timesince }} ago</span>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <p>no posts yet. probably reading a book.</p>
+  </div>
+{% endif %}
+{% endblock %}

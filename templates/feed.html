@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}feed — ant.social{% endblock %}
+
+{% block content %}
+<div class="compose-box">
+  <form method="post" action="{% url 'create_post' %}">
+    {% csrf_token %}
+    <textarea name="content" id="compose-textarea" maxlength="280"
+              placeholder="what's on your mind? (then go read a book)"></textarea>
+    <div class="compose-footer">
+      <span class="char-count" id="char-counter">280</span>
+      <button type="submit" class="btn btn-primary btn-small">post</button>
+    </div>
+  </form>
+</div>
+
+{% if posts %}
+  {% for post in posts %}
+  <div class="post-card">
+    <div class="post-header">
+      {% if post.author.profile.profile_picture %}
+      <img src="{{ post.author.profile.profile_picture.url }}" alt="" class="post-avatar" />
+      {% else %}
+      <div class="post-avatar-placeholder">{{ post.author.username.0 }}</div>
+      {% endif %}
+      <div class="post-meta">
+        <a href="{% url 'profile' post.author.username %}" class="display-name">{{ post.author.profile.display_name }}</a>
+        <span class="username">@{{ post.author.username }}</span>
+      </div>
+      <span class="post-meta timestamp" style="margin-left: auto">{{ post.created_at|timesince }} ago</span>
+    </div>
+    <a href="{% url 'post_detail' post.id %}" style="color: inherit">
+      <div class="post-content">{{ post.content }}</div>
+    </a>
+    <div class="post-actions">
+      <button data-like-post="{{ post.id }}"
+              class="{% if post.id in liked_post_ids %}liked{% endif %}">
+        ♥ <span class="like-count">{{ post.likes_count }}</span>
+      </button>
+      <a href="{% url 'post_detail' post.id %}">✎ {{ post.comments_count }}</a>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <h3>nothing here yet</h3>
+    <p>follow some people or post something. or better yet, go outside.</p>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  initCharCounter("compose-textarea", "char-counter", 280);
+</script>
+{% endblock %}

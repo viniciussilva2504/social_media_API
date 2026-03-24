@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ list_type }} — @{{ profile_user.username }} — ant.social{% endblock %}
+
+{% block content %}
+<h2 class="section-title">
+  <a href="{% url 'profile' profile_user.username %}">@{{ profile_user.username }}</a>
+  / {{ list_type|lower }}
+</h2>
+
+{% if users %}
+<ul class="user-list">
+  {% for u in users %}
+  <li class="user-list-item">
+    {% if u.profile.profile_picture %}
+    <img src="{{ u.profile.profile_picture.url }}" alt="" class="post-avatar" />
+    {% else %}
+    <div class="post-avatar-placeholder">{{ u.username.0 }}</div>
+    {% endif %}
+    <div class="user-info">
+      <a href="{% url 'profile' u.username %}" class="display-name">{{ u.profile.display_name }}</a>
+      <span class="username">@{{ u.username }}</span>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty-state">
+  <p>nobody here. just the way it should be.</p>
+</div>
+{% endif %}
+{% endblock %}

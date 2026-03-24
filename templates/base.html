@@ -1,0 +1,47 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}ant.social{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <nav>
+      <a href="{% url 'home' %}" class="logo">
+        ant.social
+        <span>go read a book</span>
+      </a>
+      <div class="nav-links">
+        {% if user.is_authenticated %}
+        <a href="{% url 'feed' %}">feed</a>
+        <a href="{% url 'search' %}">search</a>
+        <a href="{% url 'profile' user.username %}">@{{ user.username }}</a>
+        <a href="{% url 'logout' %}">logout</a>
+        {% else %}
+        <a href="{% url 'login' %}">login</a>
+        <a href="{% url 'register' %}">register</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <main>
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+      <div class="footer-quote" id="footer-quote"></div>
+    </footer>
+
+    <script src="{% static 'js/app.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

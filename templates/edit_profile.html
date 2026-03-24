@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}edit profile — ant.social{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h2>edit profile</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="display_name">display name</label>
+      <input type="text" id="display_name" name="display_name"
+             value="{{ profile.display_name }}" maxlength="100" />
+    </div>
+    <div class="form-group">
+      <label for="bio">bio</label>
+      <textarea id="bio" name="bio" maxlength="280" rows="3">{{ profile.bio }}</textarea>
+    </div>
+    <div class="form-group">
+      <label for="profile_picture">profile picture</label>
+      {% if profile.profile_picture %}
+      <img src="{{ profile.profile_picture.url }}" alt="" class="post-avatar" style="margin-bottom: 8px; display: block" />
+      {% endif %}
+      <input type="file" id="profile_picture" name="profile_picture" accept="image/*" />
+    </div>
+    <div class="form-group">
+      <label for="new_password">new password (optional)</label>
+      <input type="password" id="new_password" name="new_password"
+             minlength="8" placeholder="leave blank to keep current" />
+    </div>
+    <button type="submit" class="btn btn-primary" style="width: 100%">save changes</button>
+  </form>
+  <a href="{% url 'profile' request.user.username %}"
+     style="display: block; text-align: center; margin-top: 16px; font-size: 13px; color: #888;">cancel</a>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}register — ant.social{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h2>register</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="username">username</label>
+      <input type="text" id="username" name="username" required autofocus maxlength="150" />
+    </div>
+    <div class="form-group">
+      <label for="email">email</label>
+      <input type="email" id="email" name="email" />
+    </div>
+    <div class="form-group">
+      <label for="password">password</label>
+      <input type="password" id="password" name="password" required minlength="8" />
+    </div>
+    <div class="form-group">
+      <label for="password_confirm">confirm password</label>
+      <input type="password" id="password_confirm" name="password_confirm" required minlength="8" />
+    </div>
+    <button type="submit" class="btn btn-primary" style="width: 100%">register</button>
+  </form>
+  <p style="margin-top: 16px; font-size: 13px; color: #888; text-align: center">
+    already have an account?
+    <a href="{% url 'login' %}" style="font-weight: 600">login</a>
+  </p>
+</div>
+{% endblock %}

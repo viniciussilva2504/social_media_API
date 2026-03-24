@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}new post — ant.social{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 640px">
+  <h2>new post</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <textarea name="content" id="compose-textarea" maxlength="280" rows="4"
+                placeholder="what's on your mind? (keep it short)" required></textarea>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <span class="char-count" id="char-counter">280</span>
+      <button type="submit" class="btn btn-primary">post</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  initCharCounter("compose-textarea", "char-counter", 280);
+</script>
+{% endblock %}

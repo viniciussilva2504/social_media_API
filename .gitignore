@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+
+# Database
+db.sqlite3
+
+# Media uploads
+media/
+
+# Static collected
+staticfiles/
+
+# Environment
+env.dev
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Poetry
+poetry.lock
