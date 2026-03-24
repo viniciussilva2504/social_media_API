@@ -1,6 +1,12 @@
 # ant.social — anti social media
 
-A minimalist Twitter clone built with Django + Django REST Framework.
+![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.0+-092E20?logo=django&logoColor=white)
+![DRF](https://img.shields.io/badge/DRF-3.14+-A30000)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+A minimalist anti-social media platform built with Django + Django REST Framework.
 *"go read a book"*
 
 ---
@@ -21,10 +27,11 @@ A minimalist Twitter clone built with Django + Django REST Framework.
 
 ## Tech Stack
 
-- **Backend**: Python 3.14 + Django 6.0 + Django REST Framework
-- **Database**: SQLite (dev) / PostgreSQL (Docker/prod)
-- **Frontend**: Django Templates + Vanilla JS
-- **Containerization**: Docker + Docker Compose
+- **Backend**: Python 3.12+ · Django 5.0+ · Django REST Framework 3.14+
+- **Database**: SQLite (dev/PythonAnywhere) · PostgreSQL (Docker)
+- **Frontend**: Django Templates · Vanilla JS
+- **Containerization**: Docker · Docker Compose
+- **Auth**: Session-based (web) · Token-based (API)
 
 ---
 
@@ -89,9 +96,9 @@ DEBUG=1
 SECRET_KEY=your-secret-key
 DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
 SQL_ENGINE=django.db.backends.postgresql
-SQL_DATABASE=basic_dev_db
-SQL_USER=basic_dev
-SQL_PASSWORD=basic_dev
+SQL_DATABASE=antisocial_dev_db
+SQL_USER=antisocial_dev
+SQL_PASSWORD=antisocial_dev
 SQL_HOST=db
 SQL_PORT=5432
 ```
@@ -182,40 +189,26 @@ git clone https://github.com/viniciussilva2504/social_media_API.git
 
 ```bash
 cd ~/social_media_API
-python3.10 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
 ```
 
-> **Note**: PythonAnywhere may not have Python 3.14. Use the latest available version (e.g., 3.10, 3.12). Check with: `python3 --version`
+> **Note**: Use the latest Python version available on PythonAnywhere. Check with: `python3 --version`
 
 #### 5. Install Dependencies
 
 ```bash
-pip install django djangorestframework Pillow
+pip install -r requirements.txt
 ```
 
-#### 6. Configure Settings for Production
+#### 6. Configure Production Environment
 
-Edit `social_media/settings.py` or create environment variables:
-
-```bash
-export SECRET_KEY='your-strong-random-secret-key-here'
-export DEBUG=0
-export DJANGO_ALLOWED_HOSTS='YOURUSERNAME.pythonanywhere.com'
-```
-
-**Or** edit `social_media/settings.py` directly:
-
-```python
-DEBUG = 0
-ALLOWED_HOSTS = ['YOURUSERNAME.pythonanywhere.com']
-SECRET_KEY = 'generate-a-strong-key-here'
-```
-
-To generate a secret key:
+Generate a secret key:
 ```bash
 python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
+
+These environment variables will be set in the WSGI file (step 10).
 
 #### 7. Run Migrations
 
@@ -306,24 +299,6 @@ python manage.py collectstatic --noinput
 ```
 
 Then click **"Reload"** on the Web tab.
-
----
-
-### Exporting requirements.txt (for PythonAnywhere)
-
-If PythonAnywhere doesn't support Poetry, export to requirements.txt:
-
-```bash
-# On your local machine
-poetry export -f requirements.txt --output requirements.txt --without-hashes
-```
-
-Or create `requirements.txt` manually:
-```
-django>=5.0,<7.0
-djangorestframework>=3.14,<4.0
-Pillow>=10.0,<12.0
-```
 
 ---
 
