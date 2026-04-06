@@ -1,5 +1,5 @@
 # `python-base` sets up all our shared environment variables
-FROM python:3.14-slim AS python-base
+FROM python:3.12-slim AS python-base
 
 # python
 ENV PYTHONUNBUFFERED=1 \
@@ -57,8 +57,13 @@ WORKDIR /app
 
 COPY . /app/
 
-RUN python manage.py collectstatic --noinput || true
+RUN SECRET_KEY=build-placeholder DEBUG=1 python manage.py collectstatic --noinput || true
+
+# Create non-root user
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser \
+    && chown -R appuser:appgroup /app
+USER appuser
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "social_media.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "--max-requests", "1000", "--max-requests-jitter", "50", "--access-logfile", "-"]

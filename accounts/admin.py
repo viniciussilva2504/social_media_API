@@ -6,8 +6,10 @@ from accounts.models import Profile, Follow
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ["user", "display_name", "created_at"]
     search_fields = ["user__username", "display_name"]
+    list_select_related = ["user"]
 
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     list_display = ["follower", "following", "created_at"]
+    list_select_related = ["follower", "following"]

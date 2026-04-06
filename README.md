@@ -1,358 +1,192 @@
-# ant.social — anti social media
+# ant.social API
 
 ![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
-![Django](https://img.shields.io/badge/Django-5.0+-092E20?logo=django&logoColor=white)
-![DRF](https://img.shields.io/badge/DRF-3.14+-A30000)
-![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5%2B-092E20?logo=django&logoColor=white)
+![DRF](https://img.shields.io/badge/DRF-3.16%2B-A30000)
+![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20Token-0ea5e9)
+![CI](https://github.com/viniciussilva2504/social_media_API/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-A minimalist anti-social media platform built with Django + Django REST Framework.
-*"go read a book"*
+A minimalist social platform backend and web UI built with Django + Django REST Framework.
 
----
+This project is designed as a production-minded portfolio piece: authentication, social graph, feed, API docs, tests, rate limiting, caching, and deployment support.
 
-## Features
+## Why this project matters
 
-- **Authentication**: Register, login, logout with token-based auth (API) and session-based auth (web)
-- **Profiles**: Display name, bio, profile picture, password change
-- **Follow system**: Follow/unfollow users, see followers/following lists
-- **Feed**: Posts from people you follow (+ your own)
-- **Posts**: Create, edit, delete (280 char limit)
-- **Likes**: Toggle likes on posts
-- **Comments**: Comment on any post
-- **Search**: Find users by username
-- **REST API**: Full API at `/antisocial/v1/`
+- Real backend ownership: API + database + auth + permissions.
+- Frontend integration ready: REST API with schema/docs.
+- Engineering maturity: CI pipeline, request tracing, healthcheck, cache invalidation strategy.
 
----
+## Core features
 
-## Tech Stack
+- Authentication
+- Session auth (web)
+- Token auth (DRF token)
+- JWT auth (access + refresh)
+- Profiles
+- Display name, bio, profile picture (file type and size validation)
+- Follow system
+- Follow/unfollow, followers, following
+- Feed
+- Personalized feed (followed users + own posts)
+- Response caching with invalidation on social events
+- Posts
+- Create, edit, soft delete, list with pagination
+- Likes and comments
+- Like/unlike toggle, comment CRUD
+- API docs
+- OpenAPI schema, Swagger, Redoc
+- Ops and observability
+- Healthcheck endpoint
+- Request ID propagation in logs and response headers
 
-- **Backend**: Python 3.12+ · Django 5.0+ · Django REST Framework 3.14+
-- **Database**: SQLite (dev/PythonAnywhere) · PostgreSQL (Docker)
-- **Frontend**: Django Templates · Vanilla JS
-- **Containerization**: Docker · Docker Compose
-- **Auth**: Session-based (web) · Token-based (API)
+## Architecture overview
 
----
+```text
+Browser / API Client
+        |
+        v
+Django URL Router
+  |-- accounts app (auth, profile, follow)
+  |-- posts app (post, feed, like, comment)
+  |-- docs/health endpoints
+        |
+        v
+DRF ViewSets -> Serializers -> Models -> SQLite/PostgreSQL
+        |
+        v
+Cache Layer (feed response cache with versioned invalidation)
+```
 
-## Quick Start (Local)
+## Tech stack
+
+- Python 3.12+
+- Django 5+
+- Django REST Framework
+- drf-spectacular (OpenAPI)
+- djangorestframework-simplejwt
+- SQLite (local) / PostgreSQL (Docker)
+- Docker + Docker Compose
+- GitHub Actions CI
+
+## Quick start (local)
 
 ```bash
-# 1. Clone the repo
 git clone https://github.com/viniciussilva2504/social_media_API.git
 cd social_media_API
 
-# 2. Install dependencies
+# Poetry
 poetry install --only main --no-root
-
-# 3. Run migrations
 poetry run python manage.py migrate
-
-# 4. Create superuser (optional)
-poetry run python manage.py createsuperuser
-
-# 5. Run server
 poetry run python manage.py runserver
+
+# or pip
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
 ```
 
-Open **http://127.0.0.1:8000/**
+Open: http://127.0.0.1:8000/
 
----
-
-## Docker Setup
-
-### Build and Run
+## Docker
 
 ```bash
-# Build and start containers
 docker compose build
 docker compose up -d
-
-# Run migrations inside container
 docker compose exec web python manage.py migrate
-
-# Create superuser
-docker compose exec web python manage.py createsuperuser
 ```
 
-### Using Makefile
+## API endpoints
+
+Base path: `/antisocial/v1/`
+
+- Auth
+- `POST /register/`
+- `POST /login/`
+- `POST /auth/jwt/token/`
+- `POST /auth/jwt/refresh/`
+- `POST /api-token-auth/`
+- Profile and users
+- `GET /profile/`
+- `GET /profile/{username}/`
+- `PATCH /profile/me/`
+- `GET /users/?q=search`
+- Follow
+- `POST /follow/toggle/{username}/`
+- `GET /follow/followers/{username}/`
+- `GET /follow/following/{username}/`
+- Posts and feed
+- `GET /post/`
+- `POST /post/`
+- `GET /post/{id}/`
+- `PATCH /post/{id}/`
+- `DELETE /post/{id}/`
+- `GET /feed/`
+- Social interactions
+- `POST /like/toggle/{post_id}/`
+- `GET /comment/?post_id={id}`
+- `POST /comment/`
+- `DELETE /comment/{id}/`
+
+## API docs and health
+
+- OpenAPI schema: `/api/schema/`
+- Swagger UI: `/api/docs/`
+- Redoc: `/api/redoc/`
+- Healthcheck: `/health/`
+
+## Security and reliability highlights
+
+- Password validation via Django validators.
+- Upload hardening for profile pictures:
+- extension and file size validation at model level
+- MIME and image decoding validation at serializer level
+- Auth endpoint throttling:
+- register: `5/minute`
+- login: `10/minute`
+- Global throttling for anon and authenticated users.
+- Request tracing:
+- `X-Request-ID` accepted or generated
+- echoed in response headers
+- included in application logs
+
+## Performance strategy
+
+- Query optimization with `select_related` and annotation counts.
+- Feed response cache with per-user versioned keys.
+- Cache invalidation on:
+- post create/delete
+- comment create/delete
+- like toggle
+- follow/unfollow
+
+## Testing
 
 ```bash
-make build          # Build Docker image
-make run            # Start containers
-make migrate        # Apply migrations
-make superuser      # Create superuser
-make stop           # Stop containers
-make shell          # Access container shell
-make clean          # Remove everything
+python manage.py test -v 2
 ```
 
-### Docker Environment Variables
+Test coverage includes:
 
-Edit `env.dev` for development:
+- API auth/register/login/JWT
+- Feed, posts, comments, likes, follows
+- Permissions and ownership rules
+- Healthcheck and request ID header presence
 
-```
-DEBUG=1
-SECRET_KEY=your-secret-key
-DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
-SQL_ENGINE=django.db.backends.postgresql
-SQL_DATABASE=antisocial_dev_db
-SQL_USER=antisocial_dev
-SQL_PASSWORD=antisocial_dev
-SQL_HOST=db
-SQL_PORT=5432
-```
+## CI pipeline
 
----
+GitHub Actions workflow at `.github/workflows/ci.yml` runs on push/PR:
 
-## REST API Endpoints
+- install dependencies
+- run migrations
+- run test suite
 
-Base URL: `/antisocial/v1/`
+## Suggested next milestones
 
-### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/antisocial/v1/register/` | Register new user |
-| POST | `/antisocial/v1/login/` | Login (returns token) |
-| POST | `/api-token-auth/` | Get auth token |
-
-### Profiles
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/antisocial/v1/profile/` | List all profiles |
-| GET | `/antisocial/v1/profile/{username}/` | Get profile |
-| PATCH | `/antisocial/v1/profile/me/` | Update own profile |
-| GET | `/antisocial/v1/users/?q=search` | Search users |
-
-### Follow
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/antisocial/v1/follow/toggle/{username}/` | Follow/Unfollow |
-| GET | `/antisocial/v1/follow/followers/{username}/` | Get followers |
-| GET | `/antisocial/v1/follow/following/{username}/` | Get following |
-
-### Posts
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/antisocial/v1/post/` | List all posts |
-| POST | `/antisocial/v1/post/` | Create post |
-| GET | `/antisocial/v1/post/{id}/` | Get post |
-| PUT/PATCH | `/antisocial/v1/post/{id}/` | Edit post |
-| DELETE | `/antisocial/v1/post/{id}/` | Delete post |
-
-### Feed
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/antisocial/v1/feed/` | Get feed (followed users' posts) |
-
-### Likes
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/antisocial/v1/like/toggle/{post_id}/` | Like/Unlike post |
-
-### Comments
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/antisocial/v1/comment/?post_id={id}` | List comments |
-| POST | `/antisocial/v1/comment/` | Create comment |
-| DELETE | `/antisocial/v1/comment/{id}/` | Delete comment |
-
-### API Authentication
-
-Use Token auth header:
-```
-Authorization: Token your-token-here
-```
-
----
-
-## Deploy to PythonAnywhere
-
-### Step-by-step guide
-
-#### 1. Create PythonAnywhere Account
-- Go to [pythonanywhere.com](https://www.pythonanywhere.com/)
-- Sign up for a free account (or paid for custom domain)
-- Your site will be at: `https://YOURUSERNAME.pythonanywhere.com`
-
-#### 2. Open a Bash Console
-On PythonAnywhere dashboard → **"Consoles"** → **"Bash"**
-
-#### 3. Clone the Repository
-
-```bash
-cd ~
-git clone https://github.com/viniciussilva2504/social_media_API.git
-```
-
-#### 4. Create Virtual Environment
-
-```bash
-cd ~/social_media_API
-python3.12 -m venv .venv
-source .venv/bin/activate
-```
-
-> **Note**: Use the latest Python version available on PythonAnywhere. Check with: `python3 --version`
-
-#### 5. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-#### 6. Configure Production Environment
-
-Generate a secret key:
-```bash
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-```
-
-These environment variables will be set in the WSGI file (step 10).
-
-#### 7. Run Migrations
-
-```bash
-cd ~/social_media_API
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py collectstatic --noinput
-```
-
-#### 8. Configure Web App on PythonAnywhere
-
-Go to **"Web"** tab → **"Add a new web app"**:
-
-1. Choose **"Manual configuration"** (NOT Django)
-2. Select the Python version matching your virtualenv
-
-#### 9. Set Virtualenv Path
-
-In the Web tab, under **"Virtualenv"**:
-```
-/home/YOURUSERNAME/social_media_API/.venv
-```
-
-#### 10. Configure WSGI File
-
-Click on the WSGI configuration file link (`/var/www/YOURUSERNAME_pythonanywhere_com_wsgi.py`)
-
-Replace ALL contents with:
-
-```python
-import os
-import sys
-
-# Add your project directory to the sys.path
-project_home = '/home/YOURUSERNAME/social_media_API'
-if project_home not in sys.path:
-    sys.path.insert(0, project_home)
-
-# Set environment variables
-os.environ['DJANGO_SETTINGS_MODULE'] = 'social_media.settings'
-os.environ['SECRET_KEY'] = 'your-strong-random-secret-key-here'
-os.environ['DEBUG'] = '0'
-os.environ['DJANGO_ALLOWED_HOSTS'] = 'YOURUSERNAME.pythonanywhere.com'
-
-# Activate your virtual env
-activate_this = '/home/YOURUSERNAME/social_media_API/.venv/bin/activate_this.py'
-exec(open(activate_this).read(), {'__file__': activate_this})
-
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
-```
-
-> **Replace `YOURUSERNAME`** with your actual PythonAnywhere username.
-
-#### 11. Configure Static Files
-
-In the Web tab, under **"Static files"**:
-
-| URL | Directory |
-|-----|-----------|
-| `/static/` | `/home/YOURUSERNAME/social_media_API/staticfiles` |
-| `/media/` | `/home/YOURUSERNAME/social_media_API/media` |
-
-#### 12. Create Media Directory
-
-```bash
-mkdir -p ~/social_media_API/media/profile_pics
-```
-
-#### 13. Reload Web App
-
-Click **"Reload"** button on the Web tab.
-
-Your app is now live at: `https://YOURUSERNAME.pythonanywhere.com/`
-
----
-
-### Updating the Deployed App
-
-```bash
-cd ~/social_media_API
-git pull origin main
-source .venv/bin/activate
-pip install -r requirements.txt  # if dependencies changed
-python manage.py migrate         # if models changed
-python manage.py collectstatic --noinput
-```
-
-Then click **"Reload"** on the Web tab.
-
----
-
-## Project Structure
-
-```
-social_media_API/
-├── social_media/           # Django project settings
-│   ├── settings.py
-│   ├── urls.py
-│   ├── wsgi.py
-│   └── asgi.py
-├── accounts/               # User auth, profiles, follows
-│   ├── models/
-│   │   ├── profile.py
-│   │   └── follow.py
-│   ├── serializers/
-│   │   ├── auth_serializer.py
-│   │   ├── profile_serializer.py
-│   │   └── follow_serializer.py
-│   ├── viewsets/
-│   │   ├── auth_viewset.py
-│   │   ├── profile_viewset.py
-│   │   └── follow_viewset.py
-│   ├── views.py            # Template views
-│   ├── urls.py             # Web URLs
-│   └── api_urls.py         # REST API URLs
-├── posts/                  # Posts, likes, comments, feed
-│   ├── models/
-│   │   ├── post.py
-│   │   ├── like.py
-│   │   └── comment.py
-│   ├── serializers/
-│   │   ├── post_serializer.py
-│   │   ├── like_serializer.py
-│   │   └── comment_serializer.py
-│   ├── viewsets/
-│   │   ├── post_viewset.py
-│   │   ├── like_viewset.py
-│   │   ├── comment_viewset.py
-│   │   └── feed_viewset.py
-│   ├── views.py            # Template views
-│   ├── urls.py             # Web URLs
-│   └── api_urls.py         # REST API URLs
-├── templates/              # HTML templates
-├── static/                 # CSS + JS
-├── Dockerfile
-├── docker-compose.yml
-├── Makefile
-├── pyproject.toml
-└── env.dev
-```
-
----
+- Add `pytest-cov` gate in CI (minimum coverage threshold).
+- Add Sentry for production error tracking.
+- Add Redis cache backend for production feed caching.
+- Ship a Next.js frontend consuming this API as a dedicated full-stack showcase.
 
 ## License
 

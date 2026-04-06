@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}ant.social{% endblock %}</title>
+    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
   </head>
   <body>
@@ -18,7 +19,10 @@
         <a href="{% url 'feed' %}">feed</a>
         <a href="{% url 'search' %}">search</a>
         <a href="{% url 'profile' user.username %}">@{{ user.username }}</a>
-        <a href="{% url 'logout' %}">logout</a>
+        <form method="post" action="{% url 'logout' %}" style="display:inline">
+          {% csrf_token %}
+          <button type="submit" class="nav-logout-btn">logout</button>
+        </form>
         {% else %}
         <a href="{% url 'login' %}">login</a>
         <a href="{% url 'register' %}">register</a>

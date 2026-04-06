@@ -20,3 +20,6 @@ class CommentSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "author_username", "author_display_name", "created_at"]
+        extra_kwargs = {
+            "post": {"required": True},
+        }

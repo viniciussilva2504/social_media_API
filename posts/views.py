@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Count, Exists, OuterRef
 
 from posts.models import Post, Like, Comment
 from accounts.models import Follow
@@ -15,17 +17,25 @@ def feed_view(request):
 
     # Include own posts in feed
     feed_user_ids = list(following_ids) + [request.user.id]
-    posts = Post.objects.filter(
-        author_id__in=feed_user_ids
-    ).select_related("author", "author__profile").order_by("-created_at")
+    posts = (
+        Post.objects.filter(author_id__in=feed_user_ids, is_active=True)
+        .select_related("author", "author__profile")
+        .annotate(
+            _likes_count=Count("likes", distinct=True),
+            _comments_count=Count("comments", distinct=True),
+            _is_liked=Exists(
+                Like.objects.filter(user=request.user, post=OuterRef("pk"))
+            ),
+        )
+        .order_by("-created_at")
+    )
 
-    liked_post_ids = Like.objects.filter(
-        user=request.user, post__in=posts
-    ).values_list("post_id", flat=True)
+    paginator = Paginator(posts, 20)
+    page = paginator.get_page(request.GET.get("page"))
 
     return render(request, "feed.html", {
-        "posts": posts,
-        "liked_post_ids": set(liked_post_ids),
+        "posts": page,
+        "liked_post_ids": {p.pk for p in page if getattr(p, "_is_liked", False)},
     })
 
 
@@ -34,6 +44,7 @@ def post_detail_view(request, post_id):
     post = get_object_or_404(
         Post.objects.select_related("author", "author__profile"),
         id=post_id,
+        is_active=True,
     )
     comments = post.comments.select_related("author", "author__profile").all()
     is_liked = Like.objects.filter(user=request.user, post=post).exists()
@@ -72,9 +83,13 @@ def create_post_view(request):
 @login_required
 def search_view(request):
     query = request.GET.get("q", "").strip()
-    users = []
+    users = User.objects.none()
     if query:
         users = User.objects.filter(
             username__icontains=query
-        ).select_related("profile")[:20]
-    return render(request, "search.html", {"users": users, "query": query})
+        ).select_related("profile").order_by("username")
+
+    paginator = Paginator(users, 20)
+    page = paginator.get_page(request.GET.get("page"))
+
+    return render(request, "search.html", {"users": page, "query": query})

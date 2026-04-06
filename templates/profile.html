@@ -20,7 +20,7 @@
   <div class="profile-stats">
     <a href="{% url 'followers' profile_user.username %}"><span class="count">{{ profile.followers_count }}</span> followers</a>
     <a href="{% url 'following' profile_user.username %}"><span class="count">{{ profile.following_count }}</span> following</a>
-    <span><span class="count">{{ posts.count }}</span> posts</span>
+    <span><span class="count">{{ posts.paginator.count }}</span> posts</span>
   </div>
 
   <div class="profile-actions">

@@ -8,7 +8,16 @@ class Follow(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("follower", "following")
+        constraints = [
+            models.UniqueConstraint(fields=["follower", "following"], name="unique_follow"),
+            models.CheckConstraint(
+                condition=~models.Q(follower=models.F("following")),
+                name="prevent_self_follow",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["follower", "following"]),
+        ]
         ordering = ["-created_at"]
 
     def __str__(self):

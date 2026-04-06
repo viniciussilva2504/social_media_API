@@ -62,6 +62,21 @@ nav .nav-links a:hover {
   border-bottom: 2px solid #111;
 }
 
+.nav-logout-btn {
+  background: none;
+  border: none;
+  color: #111;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.nav-logout-btn:hover {
+  border-bottom: 2px solid #111;
+}
+
 /* MAIN */
 main {
   max-width: 640px;
@@ -148,6 +163,70 @@ main {
 .btn-danger:hover {
   background: #c0392b;
   color: #fff;
+}
+
+/* SOCIAL LOGIN */
+.social-divider {
+  text-align: center;
+  margin: 24px 0 16px;
+  position: relative;
+}
+
+.social-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+}
+
+.social-divider span {
+  background: #fff;
+  padding: 0 12px;
+  position: relative;
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-social {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 10px 24px;
+  font-size: 13px;
+}
+
+.btn-github {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.btn-github:hover {
+  background: #fff;
+  color: #111;
+}
+
+.btn-google {
+  background: #fff;
+  color: #111;
+  border-color: #ddd;
+}
+
+.btn-google:hover {
+  background: #111;
+  color: #fff;
+  border-color: #111;
 }
 
 /* FORMS */
@@ -507,8 +586,6 @@ footer {
   font-weight: 300;
   letter-spacing: 1px;
 }
-
-
 
 /* EMPTY STATE */
 .empty-state {

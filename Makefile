@@ -1,4 +1,4 @@
-.PHONY: build run stop shell test migrations migrate clean lint format-py check help superuser
+.PHONY: build run stop shell test migrations migrate clean lint format-py check help superuser logs reset-db
 
 help:
 	@echo "Available commands:"
@@ -13,6 +13,8 @@ help:
 	@echo "  make clean       - Remove containers and images"
 	@echo "  make lint        - Run code linting"
 	@echo "  make format-py   - Format code with black"
+	@echo "  make logs        - Tail container logs"
+	@echo "  make reset-db    - Reset database (destructive)"
 
 build:
 	docker compose build
@@ -49,3 +51,14 @@ format-py:
 
 check:
 	flake8 .
+
+logs:
+	docker compose logs -f web
+
+reset-db: stop
+	docker compose down -v
+	docker compose up -d db
+	@echo "Waiting for DB..."
+	@sleep 3
+	docker compose up -d web
+	docker compose exec web python manage.py migrate

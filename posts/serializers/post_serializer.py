@@ -11,9 +11,9 @@ class PostSerializer(serializers.ModelSerializer):
     author_profile_picture = serializers.ImageField(
         source="author.profile.profile_picture", read_only=True
     )
-    likes_count = serializers.ReadOnlyField()
-    comments_count = serializers.ReadOnlyField()
-    is_liked = serializers.SerializerMethodField()
+    likes_count = serializers.IntegerField(source="_likes_count", read_only=True, default=0)
+    comments_count = serializers.IntegerField(source="_comments_count", read_only=True, default=0)
+    is_liked = serializers.BooleanField(source="_is_liked", read_only=True, default=False)
 
     class Meta:
         model = Post
@@ -30,9 +30,3 @@ class PostSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
-
-    def get_is_liked(self, obj):
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            return obj.likes.filter(user=request.user).exists()
-        return False
