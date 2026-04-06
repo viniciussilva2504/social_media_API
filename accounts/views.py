@@ -155,7 +155,7 @@ def edit_profile_view(request, username):
 def followers_view(request, username):
     user = get_object_or_404(User, username=username)
     follower_ids = Follow.objects.filter(following=user).values_list("follower_id", flat=True)
-    followers = User.objects.filter(id__in=follower_ids).select_related("profile")
+    followers = User.objects.filter(id__in=follower_ids).select_related("profile").order_by("username")
     paginator = Paginator(followers, 20)
     page = paginator.get_page(request.GET.get("page"))
     return render(request, "follow_list.html", {
@@ -169,7 +169,7 @@ def followers_view(request, username):
 def following_view(request, username):
     user = get_object_or_404(User, username=username)
     following_ids = Follow.objects.filter(follower=user).values_list("following_id", flat=True)
-    following = User.objects.filter(id__in=following_ids).select_related("profile")
+    following = User.objects.filter(id__in=following_ids).select_related("profile").order_by("username")
     paginator = Paginator(following, 20)
     page = paginator.get_page(request.GET.get("page"))
     return render(request, "follow_list.html", {
