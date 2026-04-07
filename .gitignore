@@ -30,9 +30,3 @@ Thumbs.db
 
 # Poetry
 poetry.lock
-
-# Node / Cypress
-node_modules/
-cypress/videos/
-cypress/screenshots/
-cypress/downloads/
