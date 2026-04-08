@@ -5,6 +5,7 @@ Django settings for social_media project.
 import os
 from pathlib import Path
 from datetime import timedelta
+from urllib.parse import urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,6 +19,11 @@ if not SECRET_KEY:
 DEBUG = int(os.environ.get("DEBUG", 0))
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1").split()
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS = [f"https://{RENDER_EXTERNAL_HOSTNAME}"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -91,6 +97,20 @@ DATABASES = {
         "CONN_MAX_AGE": int(os.environ.get("CONN_MAX_AGE", 0)),
     }
 }
+
+# Render provides DATABASE_URL — override individual SQL_* vars when present.
+_database_url = os.environ.get("DATABASE_URL")
+if _database_url:
+    _parsed = urlparse(_database_url)
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": _parsed.path.lstrip("/"),
+        "USER": _parsed.username,
+        "PASSWORD": _parsed.password,
+        "HOST": _parsed.hostname,
+        "PORT": _parsed.port or 5432,
+        "CONN_MAX_AGE": int(os.environ.get("CONN_MAX_AGE", 600)),
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
