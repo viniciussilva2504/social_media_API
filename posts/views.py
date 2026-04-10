@@ -6,19 +6,12 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Exists, OuterRef
 
 from posts.models import Post, Like, Comment
-from accounts.models import Follow
 
 
 @login_required
 def feed_view(request):
-    following_ids = Follow.objects.filter(
-        follower=request.user
-    ).values_list("following_id", flat=True)
-
-    # Include own posts in feed
-    feed_user_ids = list(following_ids) + [request.user.id]
     posts = (
-        Post.objects.filter(author_id__in=feed_user_ids, is_active=True)
+        Post.objects.filter(is_active=True)
         .select_related("author", "author__profile")
         .annotate(
             _likes_count=Count("likes", distinct=True),

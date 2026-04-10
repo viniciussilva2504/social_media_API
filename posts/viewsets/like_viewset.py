@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.db.models import Count
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -16,17 +17,19 @@ class LikeViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["post"], url_path="toggle/(?P<post_id>[0-9]+)")
     def toggle(self, request, post_id=None, **kwargs):
         post = get_object_or_404(Post, id=post_id, is_active=True)
-        like, created = Like.objects.get_or_create(user=request.user, post=post)
-        if not created:
+        try:
+            like = Like.objects.get(user=request.user, post=post)
             like.delete()
+            liked = False
+        except Like.DoesNotExist:
+            try:
+                Like.objects.create(user=request.user, post=post)
+                liked = True
+            except IntegrityError:
+                liked = True
         invalidate_feed_for_author_and_followers(post.author_id)
-        likes_count = (
-            Post.objects.filter(pk=post.pk)
-            .annotate(_count=Count("likes"))
-            .values_list("_count", flat=True)
-            .first()
-        ) or 0
+        likes_count = post.likes.count()
         return Response(
-            {"status": "liked" if created else "unliked", "likes_count": likes_count},
-            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+            {"status": "liked" if liked else "unliked", "likes_count": likes_count},
+            status=status.HTTP_201_CREATED if liked else status.HTTP_200_OK,
         )

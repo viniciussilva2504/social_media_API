@@ -1,5 +1,7 @@
 # ant.social API
 
+- https://vjsilva250490.pythonanywhere.com
+
 ![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django-5%2B-092E20?logo=django&logoColor=white)
 ![DRF](https://img.shields.io/badge/DRF-3.16%2B-A30000)
@@ -16,6 +18,7 @@ This project is designed as a production-minded portfolio piece: authentication,
 - Real backend ownership: API + database + auth + permissions.
 - Frontend integration ready: REST API with schema/docs.
 - Engineering maturity: CI pipeline, request tracing, healthcheck, cache invalidation strategy.
+
 
 ## Core features
 
@@ -39,6 +42,17 @@ This project is designed as a production-minded portfolio piece: authentication,
 - Ops and observability
 - Healthcheck endpoint
 - Request ID propagation in logs and response headers
+
+## Web UI: principais páginas
+
+- **Feed:** exibe posts dos usuários seguidos e do próprio usuário, com suporte a curtidas, comentários e paginação.
+- **Criar post:** formulário para criar posts com upload de imagem (estilo Polaroid), legenda e visualização instantânea.
+- **Detalhe do post:** visualização individual do post, comentários, curtidas e opções de edição/remoção (se proprietário).
+- **Perfil:** exibe informações do usuário, foto, bio, lista de seguidores/seguindo e posts do usuário.
+- **Editar perfil:** permite atualizar nome, bio e foto de perfil.
+- **Lista de seguidores/seguindo:** páginas dedicadas para visualizar conexões sociais.
+- **Busca de usuários:** pesquisa por nome de usuário para seguir ou visualizar perfis.
+- **Autenticação:** páginas de login, registro, confirmação de e-mail e recuperação de senha.
 
 ## Architecture overview
 
@@ -86,7 +100,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Open: http://127.0.0.1:8000/
+Open: http://127.0.0.1:8000/ or https://vjsilva250490.pythonanywhere.com
 
 ## Docker
 

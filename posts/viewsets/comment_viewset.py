@@ -14,8 +14,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = (
-            Comment.objects.select_related("author", "author__profile")
-            .all()
+            Comment.objects.select_related("author", "author__profile", "post")
+            .filter(post__is_active=True)
             .order_by("created_at")
         )
         post_id = self.request.query_params.get("post_id")

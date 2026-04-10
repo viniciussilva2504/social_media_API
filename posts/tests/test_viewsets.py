@@ -87,7 +87,7 @@ class FeedViewSetTest(TestCase):
         self.client.force_authenticate(user=self.user)
         Follow.objects.create(follower=self.user, following=self.other)
 
-    def test_feed_shows_followed_and_own_posts(self):
+    def test_feed_shows_all_active_posts(self):
         Post.objects.create(author=self.user, content="My post")
         Post.objects.create(author=self.other, content="Followed post")
         Post.objects.create(author=self.stranger, content="Stranger post")
@@ -96,7 +96,7 @@ class FeedViewSetTest(TestCase):
         contents = [p["content"] for p in resp.data["results"]]
         self.assertIn("My post", contents)
         self.assertIn("Followed post", contents)
-        self.assertNotIn("Stranger post", contents)
+        self.assertIn("Stranger post", contents)
 
     def test_feed_excludes_soft_deleted(self):
         post = Post.objects.create(author=self.other, content="Deleted")
