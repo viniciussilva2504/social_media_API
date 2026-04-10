@@ -23,9 +23,12 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
         following_ids = Follow.objects.filter(
             follower=user
         ).values_list("following_id", flat=True)
-        feed_user_ids = list(following_ids) + [user.id]
+        from django.db.models import Q
         return (
-            Post.objects.filter(author_id__in=feed_user_ids, is_active=True)
+            Post.objects.filter(
+                Q(author_id__in=following_ids) | Q(author=user),
+                is_active=True,
+            )
             .select_related("author", "author__profile")
             .annotate(
                 _likes_count=Count("likes", distinct=True),

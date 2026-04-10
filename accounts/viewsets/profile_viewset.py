@@ -16,6 +16,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     lookup_field = "user__username"
     lookup_url_kwarg = "username"
+    lookup_value_regex = r"[\w.@+-]+"
     permission_classes = [IsProfileOwner]
 
     def get_permissions(self):
