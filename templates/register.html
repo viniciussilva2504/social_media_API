@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load socialaccount %}
 
 {% block title %}register — ant.social{% endblock %}
 
@@ -13,7 +12,7 @@
       <input type="text" id="username" name="username" required autofocus maxlength="150" />
     </div>
     <div class="form-group">
-      <label for="email">email</label>
+      <label for="email">email (optional)</label>
       <input type="email" id="email" name="email" />
     </div>
     <div class="form-group">
@@ -26,14 +25,6 @@
     </div>
     <button type="submit" class="btn btn-primary" style="width: 100%">register</button>
   </form>
-  {% get_providers as socialaccount_providers %}
-  {% if socialaccount_providers %}
-  <div class="social-divider"><span>or</span></div>
-  <div class="social-buttons">
-    <a href="{% provider_login_url 'github' %}" class="btn btn-social btn-github">&#9679; sign up with github</a>
-    <a href="{% provider_login_url 'google' %}" class="btn btn-social btn-google">&#9679; sign up with google</a>
-  </div>
-  {% endif %}
   <p style="margin-top: 16px; font-size: 13px; color: #888; text-align: center">
     already have an account?
     <a href="{% url 'login' %}" style="font-weight: 600">login</a>

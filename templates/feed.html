@@ -32,6 +32,11 @@
     </div>
     <a href="{% url 'post_detail' post.id %}" style="color: inherit">
       <div class="post-content">{{ post.content }}</div>
+      {% if post.image %}
+      <div class="polaroid">
+        <img src="{{ post.image.url }}" alt="" />
+      </div>
+      {% endif %}
     </a>
     <div class="post-actions">
       <button data-like-post="{{ post.id }}"

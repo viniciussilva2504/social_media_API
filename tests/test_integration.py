@@ -47,27 +47,6 @@ class PermissionsTest(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
 
-class PasswordResetURLsTest(TestCase):
-    """Ensure password reset pages are reachable."""
-
-    def test_password_reset_form_loads(self):
-        resp = self.client.get("/password-reset/")
-        self.assertEqual(resp.status_code, 200)
-
-    def test_password_reset_done_loads(self):
-        resp = self.client.get("/password-reset/done/")
-        self.assertEqual(resp.status_code, 200)
-
-    def test_password_reset_complete_loads(self):
-        resp = self.client.get("/password-reset/complete/")
-        self.assertEqual(resp.status_code, 200)
-
-    def test_password_reset_post_with_email(self):
-        User.objects.create_user("user", email="user@test.com", password="str0ngP@ss!")
-        resp = self.client.post("/password-reset/", {"email": "user@test.com"})
-        self.assertRedirects(resp, "/password-reset/done/")
-
-
 class HealthcheckDegradedTest(TestCase):
 
     def test_healthcheck_ok(self):

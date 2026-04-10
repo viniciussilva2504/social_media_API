@@ -165,70 +165,6 @@ main {
   color: #fff;
 }
 
-/* SOCIAL LOGIN */
-.social-divider {
-  text-align: center;
-  margin: 24px 0 16px;
-  position: relative;
-}
-
-.social-divider::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #ddd;
-}
-
-.social-divider span {
-  background: #fff;
-  padding: 0 12px;
-  position: relative;
-  font-size: 12px;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.social-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.btn-social {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: 10px 24px;
-  font-size: 13px;
-}
-
-.btn-github {
-  background: #111;
-  color: #fff;
-  border-color: #111;
-}
-
-.btn-github:hover {
-  background: #fff;
-  color: #111;
-}
-
-.btn-google {
-  background: #fff;
-  color: #111;
-  border-color: #ddd;
-}
-
-.btn-google:hover {
-  background: #111;
-  color: #fff;
-  border-color: #111;
-}
-
 /* FORMS */
 .form-container {
   max-width: 400px;
@@ -404,6 +340,31 @@ main {
 .post-actions .liked {
   color: #111;
   font-weight: 700;
+}
+
+/* POLAROID IMAGE */
+.polaroid {
+  background: #fff;
+  border: 2px solid #111;
+  padding: 12px 12px 32px;
+  margin: 12px 0;
+  display: inline-block;
+  max-width: 100%;
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.08);
+  transform: rotate(-0.5deg);
+  transition: transform 0.2s;
+}
+
+.polaroid:hover {
+  transform: rotate(0deg);
+}
+
+.polaroid img {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
 }
 
 /* COMPOSE */

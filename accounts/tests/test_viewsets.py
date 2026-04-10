@@ -68,33 +68,6 @@ class LoginViewSetTest(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class JWTAuthViewTest(TestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(
-            username="jwtuser", password="testpass123!"
-        )
-
-    def test_jwt_token_obtain_pair_success(self):
-        data = {"username": "jwtuser", "password": "testpass123!"}
-        resp = self.client.post("/antisocial/v1/auth/jwt/token/", data)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn("access", resp.data)
-        self.assertIn("refresh", resp.data)
-
-    def test_jwt_refresh_success(self):
-        obtain_resp = self.client.post(
-            "/antisocial/v1/auth/jwt/token/",
-            {"username": "jwtuser", "password": "testpass123!"},
-        )
-        refresh_resp = self.client.post(
-            "/antisocial/v1/auth/jwt/refresh/",
-            {"refresh": obtain_resp.data["refresh"]},
-        )
-        self.assertEqual(refresh_resp.status_code, status.HTTP_200_OK)
-        self.assertIn("access", refresh_resp.data)
-
-
 class HealthcheckViewTest(TestCase):
     def test_healthcheck(self):
         resp = self.client.get("/health/")

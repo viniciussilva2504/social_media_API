@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load socialaccount %}
 
 {% block title %}login — ant.social{% endblock %}
 
@@ -18,17 +17,6 @@
     </div>
     <button type="submit" class="btn btn-primary" style="width: 100%">login</button>
   </form>
-  {% get_providers as socialaccount_providers %}
-  {% if socialaccount_providers %}
-  <div class="social-divider"><span>or</span></div>
-  <div class="social-buttons">
-    <a href="{% provider_login_url 'github' %}" class="btn btn-social btn-github">&#9679; continue with github</a>
-    <a href="{% provider_login_url 'google' %}" class="btn btn-social btn-google">&#9679; continue with google</a>
-  </div>
-  {% endif %}
-  <p style="margin-top: 12px; font-size: 13px; color: #888; text-align: center">
-    <a href="{% url 'password_reset' %}" style="color: #888">forgot password?</a>
-  </p>
   <p style="margin-top: 8px; font-size: 13px; color: #888; text-align: center">
     don't have an account?
     <a href="{% url 'register' %}" style="font-weight: 600">register</a>

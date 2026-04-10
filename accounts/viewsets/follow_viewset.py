@@ -16,7 +16,7 @@ class FollowViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
 
-    @action(detail=False, methods=["post"], url_path="toggle/(?P<username>[^/.]+)")
+    @action(detail=False, methods=["post"], url_path="toggle/(?P<username>[\w.@+-]+)")
     def toggle(self, request, username=None, **kwargs):
         target_user = get_object_or_404(User, username=username)
         if target_user == request.user:
@@ -41,7 +41,7 @@ class FollowViewSet(viewsets.ViewSet):
         serializer = UserSearchSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-    @action(detail=False, methods=["get"], url_path="followers/(?P<username>[^/.]+)")
+    @action(detail=False, methods=["get"], url_path="followers/(?P<username>[\w.@+-]+)")
     def followers(self, request, username=None, **kwargs):
         user = get_object_or_404(User, username=username)
         follower_users = User.objects.filter(
@@ -49,7 +49,7 @@ class FollowViewSet(viewsets.ViewSet):
         ).select_related("profile").order_by("username")
         return self._paginate(follower_users, request)
 
-    @action(detail=False, methods=["get"], url_path="following/(?P<username>[^/.]+)")
+    @action(detail=False, methods=["get"], url_path="following/(?P<username>[\w.@+-]+)")
     def following_list(self, request, username=None, **kwargs):
         user = get_object_or_404(User, username=username)
         following_users = User.objects.filter(

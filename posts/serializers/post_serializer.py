@@ -23,6 +23,7 @@ class PostSerializer(serializers.ModelSerializer):
             "author_display_name",
             "author_profile_picture",
             "content",
+            "image",
             "likes_count",
             "comments_count",
             "is_liked",

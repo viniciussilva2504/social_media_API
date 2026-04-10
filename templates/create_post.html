@@ -5,11 +5,15 @@
 {% block content %}
 <div class="form-container" style="max-width: 640px">
   <h2>new post</h2>
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">
       <textarea name="content" id="compose-textarea" maxlength="280" rows="4"
                 placeholder="what's on your mind? (keep it short)" required></textarea>
+    </div>
+    <div class="form-group">
+      <label for="image">image (optional)</label>
+      <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp" />
     </div>
     <div style="display: flex; justify-content: space-between; align-items: center">
       <span class="char-count" id="char-counter">280</span>
