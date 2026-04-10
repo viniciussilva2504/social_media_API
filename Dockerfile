@@ -1,68 +1,54 @@
-# `python-base` sets up all our shared environment variables
-FROM python:3.12-slim AS python-base
+# ── Stage 1: builder ─────────────────────────────────────────────
+FROM python:3.12-slim AS builder
 
-# python
 ENV PYTHONUNBUFFERED=1 \
-    # prevents python creating .pyc files
     PYTHONDONTWRITEBYTECODE=1 \
-    \
-    # pip
-    PIP_NO_CACHE_DIR=off \
+    PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100 \
-    \
-    # poetry
-    # https://python-poetry.org/docs/configuration/#using-environment-variables
-    POETRY_VERSION=2.1.4 \
-    # make poetry install to this location
-    POETRY_HOME="/opt/poetry" \
-    # make poetry create the virtual environment in the project's root
-    # it gets named `.venv`
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    # do not ask any interactive question
-    POETRY_NO_INTERACTION=1 \
-    \
-    # paths
-    # this is where our requirements + virtual environment will live
-    PYSETUP_PATH="/opt/pysetup" \
-    VENV_PATH="/opt/pysetup/.venv"
-
-
-# prepend poetry and venv to path
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+    PIP_DEFAULT_TIMEOUT=100
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
-    # deps for installing poetry
-    curl \
-    # deps for building python deps
-    build-essential
+    build-essential gcc libpq-dev libjpeg-dev zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://install.python-poetry.org | python3 -
+WORKDIR /build
+COPY requirements.txt ./
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
-# install postgres dependencies and Pillow dependencies
+# ── Stage 2: runtime ────────────────────────────────────────────
+FROM python:3.12-slim AS runtime
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Runtime-only C libs (no compilers)
 RUN apt-get update \
-    && apt-get -y install libpq-dev gcc libjpeg-dev zlib1g-dev \
-    && pip install psycopg2
+    && apt-get install --no-install-recommends -y \
+    libpq5 libjpeg62-turbo zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
-# copy project requirement files here to ensure they will be cached.
-WORKDIR $PYSETUP_PATH
-COPY poetry.lock pyproject.toml ./
+# Copy the pre-built virtualenv from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# quicker install as runtime deps are already installed
-RUN poetry install --only main --no-root
+# Non-root user
+RUN addgroup --system app && adduser --system --ingroup app app
 
 WORKDIR /app
-
 COPY . /app/
 
-RUN SECRET_KEY=build-placeholder DEBUG=1 python manage.py collectstatic --noinput || true
+RUN SECRET_KEY=build-placeholder DEBUG=1 python manage.py collectstatic --noinput
 
-# Create non-root user
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser \
-    && chown -R appuser:appgroup /app
-USER appuser
+# Own media directory
+RUN mkdir -p /app/media && chown -R app:app /app/media
+
+USER app
+
+EXPOSE 8000
+
+CMD ["gunicorn", "social_media.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "--max-requests", "1000", "--max-requests-jitter", "50"]
 
 EXPOSE 8000
 

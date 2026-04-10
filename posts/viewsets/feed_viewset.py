@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from posts.models.like import Like
 from posts.models.post import Post
 from posts.serializers.post_serializer import PostSerializer
-from accounts.models.follow import Follow
 from posts.services.feed_cache import (
     build_feed_response_cache_key,
     get_feed_cache_timeout,
@@ -20,15 +19,8 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        following_ids = Follow.objects.filter(
-            follower=user
-        ).values_list("following_id", flat=True)
-        from django.db.models import Q
         return (
-            Post.objects.filter(
-                Q(author_id__in=following_ids) | Q(author=user),
-                is_active=True,
-            )
+            Post.objects.filter(is_active=True)
             .select_related("author", "author__profile")
             .annotate(
                 _likes_count=Count("likes", distinct=True),
