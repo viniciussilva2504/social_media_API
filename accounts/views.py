@@ -2,9 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.contrib import messages
+from django.db.models import Count, Exists, OuterRef
 
 from accounts.models import Profile, Follow
+from posts.models import Like
+
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
 
 
 def home_view(request):
@@ -32,12 +40,19 @@ def register_view(request):
             messages.error(request, "Password must be at least 8 characters.")
             return render(request, "register.html")
 
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)
+            return render(request, "register.html")
+
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already taken.")
             return render(request, "register.html")
 
         user = User.objects.create_user(username=username, email=email, password=password)
-        login(request, user)
+        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
         return redirect("feed")
 
     return render(request, "register.html")
@@ -57,7 +72,9 @@ def login_view(request):
 
 
 def logout_view(request):
-    logout(request)
+    if request.method == "POST":
+        logout(request)
+        return redirect("home")
     return redirect("home")
 
 
@@ -65,14 +82,27 @@ def logout_view(request):
 def profile_view(request, username):
     user = get_object_or_404(User, username=username)
     profile = user.profile
-    posts = user.posts.all().order_by("-created_at")
+    posts = (
+        user.posts.filter(is_active=True)
+        .annotate(
+            _likes_count=Count("likes", distinct=True),
+            _comments_count=Count("comments", distinct=True),
+            _is_liked=Exists(
+                Like.objects.filter(user=request.user, post=OuterRef("pk"))
+            ),
+        )
+        .order_by("-created_at")
+    )
     is_following = Follow.objects.filter(follower=request.user, following=user).exists()
     is_own_profile = request.user == user
+
+    paginator = Paginator(posts, 20)
+    page = paginator.get_page(request.GET.get("page"))
 
     return render(request, "profile.html", {
         "profile_user": user,
         "profile": profile,
-        "posts": posts,
+        "posts": page,
         "is_following": is_following,
         "is_own_profile": is_own_profile,
     })
@@ -96,10 +126,19 @@ def edit_profile_view(request, username):
         if bio is not None:
             profile.bio = bio
         if profile_picture:
+            if profile_picture.content_type not in ALLOWED_IMAGE_TYPES:
+                messages.error(request, "Only JPEG, PNG, and WebP images are allowed.")
+                return render(request, "edit_profile.html", {"profile": profile})
+            if profile_picture.size > MAX_UPLOAD_SIZE:
+                messages.error(request, "Image must be under 5MB.")
+                return render(request, "edit_profile.html", {"profile": profile})
             profile.profile_picture = profile_picture
         if new_password:
-            if len(new_password) < 8:
-                messages.error(request, "Password must be at least 8 characters.")
+            try:
+                validate_password(new_password, request.user)
+            except ValidationError as e:
+                for error in e.messages:
+                    messages.error(request, error)
                 return render(request, "edit_profile.html", {"profile": profile})
             request.user.set_password(new_password)
             request.user.save()
@@ -116,10 +155,12 @@ def edit_profile_view(request, username):
 def followers_view(request, username):
     user = get_object_or_404(User, username=username)
     follower_ids = Follow.objects.filter(following=user).values_list("follower_id", flat=True)
-    followers = User.objects.filter(id__in=follower_ids).select_related("profile")
+    followers = User.objects.filter(id__in=follower_ids).select_related("profile").order_by("username")
+    paginator = Paginator(followers, 20)
+    page = paginator.get_page(request.GET.get("page"))
     return render(request, "follow_list.html", {
         "profile_user": user,
-        "users": followers,
+        "users": page,
         "list_type": "Followers",
     })
 
@@ -128,9 +169,11 @@ def followers_view(request, username):
 def following_view(request, username):
     user = get_object_or_404(User, username=username)
     following_ids = Follow.objects.filter(follower=user).values_list("following_id", flat=True)
-    following = User.objects.filter(id__in=following_ids).select_related("profile")
+    following = User.objects.filter(id__in=following_ids).select_related("profile").order_by("username")
+    paginator = Paginator(following, 20)
+    page = paginator.get_page(request.GET.get("page"))
     return render(request, "follow_list.html", {
         "profile_user": user,
-        "users": following,
+        "users": page,
         "list_type": "Following",
     })

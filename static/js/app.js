@@ -71,6 +71,8 @@ function getCookie(name) {
 
 // Toggle like via AJAX (called via event delegation)
 async function toggleLike(postId, btn) {
+  if (btn.disabled) return;
+  btn.disabled = true;
   const csrftoken = getCookie("csrftoken");
   try {
     const resp = await fetch(`/antisocial/v1/like/toggle/${postId}/`, {
@@ -81,6 +83,7 @@ async function toggleLike(postId, btn) {
       },
       credentials: "same-origin",
     });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
     const countEl = btn.querySelector(".like-count");
     if (countEl) countEl.textContent = data.likes_count;
@@ -91,11 +94,15 @@ async function toggleLike(postId, btn) {
     }
   } catch (err) {
     console.error("Like toggle failed:", err);
+  } finally {
+    btn.disabled = false;
   }
 }
 
 // Toggle follow via AJAX (called via event delegation)
 async function toggleFollow(username, btn) {
+  if (btn.disabled) return;
+  btn.disabled = true;
   const csrftoken = getCookie("csrftoken");
   try {
     const resp = await fetch(`/antisocial/v1/follow/toggle/${username}/`, {
@@ -106,6 +113,7 @@ async function toggleFollow(username, btn) {
       },
       credentials: "same-origin",
     });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
     if (data.status === "followed") {
       btn.textContent = "unfollow";
@@ -116,6 +124,8 @@ async function toggleFollow(username, btn) {
     }
   } catch (err) {
     console.error("Follow toggle failed:", err);
+  } finally {
+    btn.disabled = false;
   }
 }
 

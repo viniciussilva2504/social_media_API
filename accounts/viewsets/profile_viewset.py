@@ -1,6 +1,6 @@
-from rest_framework import viewsets, status
+from django.db.models import Count
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
 from django.contrib.auth.models import User
 
 from accounts.models.profile import Profile
@@ -9,20 +9,29 @@ from accounts.serializers.profile_serializer import (
     ProfileUpdateSerializer,
     UserSearchSerializer,
 )
+from social_media.permissions import IsProfileOwner
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     lookup_field = "user__username"
     lookup_url_kwarg = "username"
+    permission_classes = [IsProfileOwner]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsAuthenticated(), IsProfileOwner()]
 
     def get_queryset(self):
-        return Profile.objects.select_related("user").all().order_by("id")
+        return (
+            Profile.objects.select_related("user")
+            .annotate(
+                _followers_count=Count("user__followers", distinct=True),
+                _following_count=Count("user__following", distinct=True),
+            )
+            .order_by("id")
+        )
 
     def get_serializer_class(self):
         if self.action in ["update", "partial_update"]:
@@ -31,26 +40,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def get_object(self):
         if self.kwargs.get("username") == "me":
-            return self.request.user.profile
+            self.kwargs["username"] = self.request.user.username
         return super().get_object()
-
-    def update(self, request, *args, **kwargs):
-        profile = self.get_object()
-        if profile.user != request.user:
-            return Response(
-                {"detail": "You can only edit your own profile."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        return super().update(request, *args, **kwargs)
-
-    def partial_update(self, request, *args, **kwargs):
-        profile = self.get_object()
-        if profile.user != request.user:
-            return Response(
-                {"detail": "You can only edit your own profile."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        return super().partial_update(request, *args, **kwargs)
 
 
 class UserSearchViewSet(viewsets.ReadOnlyModelViewSet):

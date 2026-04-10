@@ -10,11 +10,35 @@ services:
       - POSTGRES_PASSWORD=antisocial_dev
       - POSTGRES_DB=antisocial_dev_db
       - POSTGRES_HOST_AUTH_METHOD=md5
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U antisocial_dev -d antisocial_dev_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - antisocial_network
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - antisocial_network
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      gunicorn social_media.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 3
+      --timeout 120
+      --max-requests 1000
+      --max-requests-jitter 50
+      --access-logfile -
+      --error-logfile -
     volumes:
       - .:/app
       - media_data:/app/media
@@ -26,7 +50,16 @@ services:
       - antisocial_network
       - frontend
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 networks:
   antisocial_network:
     driver: bridge

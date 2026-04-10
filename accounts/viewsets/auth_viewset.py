@@ -9,6 +9,7 @@ from accounts.serializers.auth_serializer import RegisterSerializer, LoginSerial
 class RegisterViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
+    throttle_scope = "auth_register"
 
     def create(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -24,6 +25,7 @@ class RegisterViewSet(viewsets.ViewSet):
 class LoginViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
+    throttle_scope = "auth_login"
 
     def create(self, request):
         serializer = LoginSerializer(data=request.data)
