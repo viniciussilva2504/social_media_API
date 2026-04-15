@@ -14,6 +14,26 @@ The architecture includes per-user versioned feed caching with event-driven inva
 
 https://vjsilva250490.pythonanywhere.com
 
+## Prints de tela
+
+Veja abaixo alguns prints de tela da aplicação web:
+
+<p align="center">
+        <img src="IMG/Captura de ecrã 2026-04-15 211413.png" alt="Tela 1" width="600"/>
+        <br>
+        <img src="IMG/Captura de ecrã 2026-04-15 211423.png" alt="Tela 2" width="600"/>
+        <br>
+        <img src="IMG/Captura de ecrã 2026-04-15 211438.png" alt="Tela 3" width="600"/>
+        <br>
+        <img src="IMG/Captura de ecrã 2026-04-15 211701.png" alt="Tela 4" width="600"/>
+        <br>
+        <img src="IMG/Captura de ecrã 2026-04-15 211712.png" alt="Tela 5" width="600"/>
+        <br>
+        <img src="IMG/Captura de ecrã 2026-04-15 211734.png" alt="Tela 6" width="600"/>
+        <br>
+        <img src="IMG/Captura de ecrã 2026-04-15 211746.png" alt="Tela 7" width="600"/>
+</p>
+
 ## Why this project matters
 
 - Real backend ownership: API + database + auth + permissions.
