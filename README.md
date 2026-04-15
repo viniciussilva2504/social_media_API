@@ -9,9 +9,10 @@
 ![CI](https://github.com/viniciussilva2504/social_media_API/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-A minimalist social platform backend and web UI built with Django + Django REST Framework.
+ant.social API is a social media backend built with Python 3.12+, Django 5+, and Django REST Framework, supporting session, DRF token, and JWT authentication. It exposes REST endpoints for profile management, a follow graph, personalized feed, image-enabled posts, likes, and comments, with auto-generated OpenAPI docs via drf-spectacular (Swagger/Redoc). The project also ships a functional web UI using Django templates and is deployed to production on PythonAnywhere.
+The architecture includes per-user versioned feed caching with event-driven invalidation, auth endpoint throttling, two-layer upload validation (model and serializer), and request tracing via X-Request-ID. Storage uses SQLite locally and PostgreSQL in production, the stack is containerized with Docker Compose, and a GitHub Actions CI pipeline runs migrations and the test suite on every push.
 
-This project is designed as a production-minded portfolio piece: authentication, social graph, feed, API docs, tests, rate limiting, caching, and deployment support.
+https://vjsilva250490.pythonanywhere.com
 
 ## Why this project matters
 
@@ -45,14 +46,14 @@ This project is designed as a production-minded portfolio piece: authentication,
 
 ## Web UI: principais páginas
 
-- **Feed:** exibe posts dos usuários seguidos e do próprio usuário, com suporte a curtidas, comentários e paginação.
-- **Criar post:** formulário para criar posts com upload de imagem (estilo Polaroid), legenda e visualização instantânea.
-- **Detalhe do post:** visualização individual do post, comentários, curtidas e opções de edição/remoção (se proprietário).
-- **Perfil:** exibe informações do usuário, foto, bio, lista de seguidores/seguindo e posts do usuário.
-- **Editar perfil:** permite atualizar nome, bio e foto de perfil.
-- **Lista de seguidores/seguindo:** páginas dedicadas para visualizar conexões sociais.
-- **Busca de usuários:** pesquisa por nome de usuário para seguir ou visualizar perfis.
-- **Autenticação:** páginas de login, registro, confirmação de e-mail e recuperação de senha.
+- **Feed:** displays posts from followed users and the user themselves, with support for likes, comments, and user authentication.
+- **Create Post:** form to create posts with image upload (Polaroid style), caption, and instant preview.
+- **Post Details:** individual post view, comments, likes, and edit/remove options (if owned).
+- **Profile:** displays user information, photo, bio, follower/following list, and user posts.
+- **Edit Profile:** allows you to update your name, bio, and profile picture.
+- **Follower/Following List:** dedicated pages to view social connections.
+- **User Search:** search by username to follow or view profiles.
+- **Authentication:** login, registration, email confirmation, and password recovery pages.
 
 ## Architecture overview
 
