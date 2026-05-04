@@ -101,8 +101,8 @@ nav .logo:hover {
 
 /* HERO MORSE — larger version */
 .morse-code--hero {
-  width: 80px;
-  gap: 3px;
+  width: 60px;
+  gap: 2px;
   margin: 0;
   justify-content: flex-end;
   align-content: center;
@@ -110,20 +110,20 @@ nav .logo:hover {
 }
 
 .morse-code--hero .md {
-  width: 9px;
-  height: 9px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
 }
 
 .morse-code--hero .ml {
-  width: 23px;
-  height: 9px;
-  border-radius: 3px;
+  width: 16px;
+  height: 6px;
+  border-radius: 2px;
 }
 
 .morse-code--hero .ms {
-  width: 5px;
-  height: 9px;
+  width: 4px;
+  height: 6px;
 }
 
 .logo-text {

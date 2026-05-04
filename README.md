@@ -1,107 +1,137 @@
-# ant.social API
+# ant.social
 
-- https://vjsilva250490.pythonanywhere.com
+> *go read a book* — a minimalist anti-social media platform
 
-![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
-![Django](https://img.shields.io/badge/Django-5%2B-092E20?logo=django&logoColor=white)
-![DRF](https://img.shields.io/badge/DRF-3.16%2B-A30000)
-![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20Token-0ea5e9)
-![CI](https://github.com/viniciussilva2504/social_media_API/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+**Live:** https://vjsilva250490.pythonanywhere.com
 
-ant.social API is a social media backend built with Python 3.12+, Django 5+, and Django REST Framework, supporting session, DRF token, and JWT authentication. It exposes REST endpoints for profile management, a follow graph, personalized feed, image-enabled posts, likes, and comments, with auto-generated OpenAPI docs via drf-spectacular (Swagger/Redoc). The project also ships a functional web UI using Django templates and is deployed to production on PythonAnywhere.
-The architecture includes per-user versioned feed caching with event-driven invalidation, auth endpoint throttling, two-layer upload validation (model and serializer), and request tracing via X-Request-ID. Storage uses SQLite locally and PostgreSQL in production, the stack is containerized with Docker Compose, and a GitHub Actions CI pipeline runs migrations and the test suite on every push.
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)](https://python.org)
+[![Django](https://img.shields.io/badge/Django-6.0-092E20?logo=django&logoColor=white)](https://djangoproject.com)
+[![DRF](https://img.shields.io/badge/DRF-3.17-A30000)](https://www.django-rest-framework.org)
+[![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20Token-0ea5e9)](https://django-rest-framework-simplejwt.readthedocs.io)
+[![CI](https://github.com/viniciussilva2504/social_media_API/actions/workflows/ci.yml/badge.svg)](https://github.com/viniciussilva2504/social_media_API/actions)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-https://vjsilva250490.pythonanywhere.com
+---
 
-## Prints de tela
+**ant.social** is a full-stack social media platform built with Python, Django 6 and Django REST Framework. It ships a complete web UI (Django templates) alongside a production-ready REST API — both living in the same codebase, deployed to PythonAnywhere.
 
-Veja abaixo alguns prints de tela da aplicação web:
+The identity is intentionally minimal and typographic, with a Bauhaus-inspired design: primary colours (red, blue, yellow), Roboto Flex, and a morse-code logo spelling out `ant.social`.
+
+---
+
+## Screenshots
 
 <p align="center">
-        <img src="IMG/Captura de ecrã 2026-04-15 211413.png" alt="Tela 1" width="600"/>
-        <br>
-        <img src="IMG/Captura de ecrã 2026-04-15 211423.png" alt="Tela 2" width="600"/>
-        <br>
-        <img src="IMG/Captura de ecrã 2026-04-15 211438.png" alt="Tela 3" width="600"/>
-        <br>
-        <img src="IMG/Captura de ecrã 2026-04-15 211701.png" alt="Tela 4" width="600"/>
-        <br>
-        <img src="IMG/Captura de ecrã 2026-04-15 211712.png" alt="Tela 5" width="600"/>
-        <br>
-        <img src="IMG/Captura de ecrã 2026-04-15 211734.png" alt="Tela 6" width="600"/>
-        <br>
-        <img src="IMG/Captura de ecrã 2026-04-15 211746.png" alt="Tela 7" width="600"/>
+  <img src="IMG/home.png" alt="Home" width="600"/>
+  <br><br>
+  <img src="IMG/feed.png" alt="Feed" width="600"/>
+  <br><br>
+  <img src="IMG/profile.png" alt="Profile" width="600"/>
+  <br><br>
+  <img src="IMG/post-detail.png" alt="Post detail" width="600"/>
+  <br><br>
+  <img src="IMG/register.png" alt="Register" width="600"/>
+  <br><br>
+  <img src="IMG/api-docs.png" alt="API docs (Swagger)" width="600"/>
 </p>
+
+---
 
 ## Why this project matters
 
-- Real backend ownership: API + database + auth + permissions.
-- Frontend integration ready: REST API with schema/docs.
-- Engineering maturity: CI pipeline, request tracing, healthcheck, cache invalidation strategy.
+| Dimension | What it demonstrates |
+|---|---|
+| **Backend ownership** | API + database + auth + permissions from scratch |
+| **Full-stack delivery** | Web UI + REST API in a single Django project |
+| **Engineering maturity** | CI pipeline, request tracing, versioned cache, throttling |
+| **Frontend-ready** | OpenAPI schema, Swagger/Redoc, CORS configured |
+| **Production ops** | Docker Compose, Gunicorn, WhiteNoise, PythonAnywhere deploy |
+
+---
 
 ## Core features
 
-- Authentication
-- Session auth (web)
-- Token auth (DRF token)
-- JWT auth (access + refresh)
-- Profiles
-- Display name, bio, profile picture (file type and size validation)
-- Follow system
-- Follow/unfollow, followers, following
-- Feed
-- Personalized feed (followed users + own posts)
-- Response caching with invalidation on social events
-- Posts
-- Create, edit, soft delete, list with pagination
-- Likes and comments
-- Like/unlike toggle, comment CRUD
-- API docs
-- OpenAPI schema, Swagger, Redoc
-- Ops and observability
-- Healthcheck endpoint
-- Request ID propagation in logs and response headers
+**Authentication**
+- Session auth (web UI)
+- DRF Token auth
+- JWT auth (access + refresh via simplejwt)
+- Auth throttling: register `5/min`, login `10/min`
 
-## Web UI: principais páginas
+**Profiles & social graph**
+- Display name, bio, profile picture (extension + MIME + size validation)
+- Follow / unfollow, followers, following lists
 
-- **Feed:** displays posts from followed users and the user themselves, with support for likes, comments, and user authentication.
-- **Create Post:** form to create posts with image upload (Polaroid style), caption, and instant preview.
-- **Post Details:** individual post view, comments, likes, and edit/remove options (if owned).
-- **Profile:** displays user information, photo, bio, follower/following list, and user posts.
-- **Edit Profile:** allows you to update your name, bio, and profile picture.
-- **Follower/Following List:** dedicated pages to view social connections.
-- **User Search:** search by username to follow or view profiles.
-- **Authentication:** login, registration, email confirmation, and password recovery pages.
+**Content**
+- Posts with optional image upload (Polaroid-style UI)
+- Soft delete (posts remain in DB, marked inactive)
+- Likes (toggle) and comments (CRUD)
+
+**Feed**
+- Personalized feed: followed users + own posts
+- Response-level cache with per-user versioned keys
+- Event-driven invalidation (post, like, comment, follow events)
+
+**Ops**
+- Healthcheck endpoint at `/health/`
+- `X-Request-ID` tracing: accepted, generated, echoed in headers and logs
+- Content moderation hook (Google Perspective API, optional)
+
+---
+
+## Web UI pages
+
+| Page | Description |
+|---|---|
+| `/` | Home with morse-code logo, rotating tagline, join/login |
+| `/feed/` | Post feed with inline like/comment, compose box |
+| `/post/<id>/` | Post detail, comments, edit/delete (if owner) |
+| `/profile/<username>/` | Profile picture, bio, stats, posts |
+| `/edit-profile/` | Update name, bio, profile picture |
+| `/followers/` `/following/` | Social connections list |
+| `/search/` | Search users by username |
+| `/login/` `/register/` | Authentication forms |
+
+---
 
 ## Architecture overview
 
 ```text
 Browser / API Client
-        |
-        v
-Django URL Router
-  |-- accounts app (auth, profile, follow)
-  |-- posts app (post, feed, like, comment)
-  |-- docs/health endpoints
-        |
-        v
-DRF ViewSets -> Serializers -> Models -> SQLite/PostgreSQL
-        |
-        v
-Cache Layer (feed response cache with versioned invalidation)
+        │
+        ▼
+  Django URL Router
+    ├── accounts/  (auth · profile · follow)
+    ├── posts/     (post · feed · like · comment)
+    └── health/    (healthcheck · OpenAPI docs)
+        │
+        ▼
+  DRF ViewSets → Serializers → Models
+        │
+        ├── SQLite  (local dev)
+        └── PostgreSQL  (production / Docker)
+        │
+        ▼
+  Cache Layer
+  (per-user versioned feed · event-driven invalidation)
 ```
+
+---
 
 ## Tech stack
 
-- Python 3.12+
-- Django 5+
-- Django REST Framework
-- drf-spectacular (OpenAPI)
-- djangorestframework-simplejwt
-- SQLite (local) / PostgreSQL (Docker)
-- Docker + Docker Compose
-- GitHub Actions CI
+| Layer | Technology |
+|---|---|
+| Language | Python 3.12+ |
+| Framework | Django 6 + Django REST Framework 3.17 |
+| Auth | Session · DRF Token · JWT (simplejwt) |
+| API docs | drf-spectacular (OpenAPI 3, Swagger, Redoc) |
+| Database | SQLite (dev) · PostgreSQL (prod) |
+| Storage | Local filesystem · Cloudinary (optional) |
+| Moderation | Google Perspective API (optional) |
+| Deploy | PythonAnywhere · Docker Compose · Gunicorn · WhiteNoise |
+| CI | GitHub Actions |
+
+---
 
 ## Quick start (local)
 
@@ -109,20 +139,33 @@ Cache Layer (feed response cache with versioned invalidation)
 git clone https://github.com/viniciussilva2504/social_media_API.git
 cd social_media_API
 
-# Poetry
-poetry install --only main --no-root
-poetry run python manage.py migrate
-poetry run python manage.py runserver
+# with pip + venv
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS/Linux
 
-# or pip
 pip install -r requirements.txt
+
+set DEBUG=1
+set SECRET_KEY=any-local-dev-key
+set DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+
 python manage.py migrate
 python manage.py runserver
 ```
 
-Open: http://127.0.0.1:8000/ or https://vjsilva250490.pythonanywhere.com
+Open: http://127.0.0.1:8000/
 
-## Docker
+```bash
+# with Poetry
+poetry install
+poetry run python manage.py migrate
+poetry run python manage.py runserver
+```
+
+---
+
+## Docker (local with PostgreSQL)
 
 ```bash
 docker compose build
@@ -130,69 +173,81 @@ docker compose up -d
 docker compose exec web python manage.py migrate
 ```
 
+Open: http://127.0.0.1:8000/
+
+---
+
 ## API endpoints
 
 Base path: `/antisocial/v1/`
 
-- Auth
-- `POST /register/`
-- `POST /login/`
-- `POST /auth/jwt/token/`
-- `POST /auth/jwt/refresh/`
-- `POST /api-token-auth/`
-- Profile and users
-- `GET /profile/`
-- `GET /profile/{username}/`
-- `PATCH /profile/me/`
-- `GET /users/?q=search`
-- Follow
-- `POST /follow/toggle/{username}/`
-- `GET /follow/followers/{username}/`
-- `GET /follow/following/{username}/`
-- Posts and feed
-- `GET /post/`
-- `POST /post/`
-- `GET /post/{id}/`
-- `PATCH /post/{id}/`
-- `DELETE /post/{id}/`
-- `GET /feed/`
-- Social interactions
-- `POST /like/toggle/{post_id}/`
-- `GET /comment/?post_id={id}`
-- `POST /comment/`
-- `DELETE /comment/{id}/`
+### Auth
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/register/` | Create account |
+| `POST` | `/login/` | Session login |
+| `POST` | `/auth/jwt/token/` | Get JWT access + refresh |
+| `POST` | `/auth/jwt/refresh/` | Refresh JWT access token |
+| `POST` | `/api-token-auth/` | Get DRF token |
 
-## API docs and health
+### Profile & Users
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/profile/` | List profiles |
+| `GET` | `/profile/{username}/` | Get profile |
+| `PATCH` | `/profile/me/` | Update own profile |
+| `GET` | `/users/?q=search` | Search users |
 
-- OpenAPI schema: `/api/schema/`
-- Swagger UI: `/api/docs/`
-- Redoc: `/api/redoc/`
-- Healthcheck: `/health/`
+### Follow
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/follow/toggle/{username}/` | Follow / unfollow |
+| `GET` | `/follow/followers/{username}/` | Followers list |
+| `GET` | `/follow/following/{username}/` | Following list |
 
-## Security and reliability highlights
+### Posts & Feed
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET/POST` | `/post/` | List / create posts |
+| `GET/PATCH/DELETE` | `/post/{id}/` | Retrieve / edit / delete |
+| `GET` | `/feed/` | Personalized feed |
 
-- Password validation via Django validators.
-- Upload hardening for profile pictures:
-- extension and file size validation at model level
-- MIME and image decoding validation at serializer level
-- Auth endpoint throttling:
-- register: `5/minute`
-- login: `10/minute`
-- Global throttling for anon and authenticated users.
-- Request tracing:
-- `X-Request-ID` accepted or generated
-- echoed in response headers
-- included in application logs
+### Social interactions
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/like/toggle/{post_id}/` | Like / unlike |
+| `GET` | `/comment/?post_id={id}` | List comments |
+| `POST` | `/comment/` | Add comment |
+| `DELETE` | `/comment/{id}/` | Delete comment |
 
-## Performance strategy
+### Docs & Health
+| Endpoint | Description |
+|---|---|
+| `/api/schema/` | OpenAPI 3 schema (YAML) |
+| `/api/docs/` | Swagger UI |
+| `/api/redoc/` | Redoc |
+| `/health/` | Healthcheck |
 
-- Query optimization with `select_related` and annotation counts.
-- Feed response cache with per-user versioned keys.
-- Cache invalidation on:
-- post create/delete
-- comment create/delete
-- like toggle
-- follow/unfollow
+---
+
+## Security highlights
+
+- Django password validators (length, common password, similarity)
+- Profile picture hardening: extension + file size (model) · MIME + image decoding (serializer)
+- Auth throttling: `5/min` register · `10/min` login · `120/min` authenticated
+- `X-Request-ID` tracing: accepted or auto-generated, echoed in response headers and logs
+- `SECURE_CONTENT_TYPE_NOSNIFF`, `X-Frame-Options`, CORS explicitly configured
+
+---
+
+## Performance
+
+- `select_related` / `prefetch_related` on feed and post queries
+- Annotation-based like/comment counts (no N+1)
+- Feed response cache with per-user versioned keys
+- Cache invalidation triggered on: post create/delete · comment create/delete · like toggle · follow/unfollow
+
+---
 
 ## Testing
 
@@ -200,27 +255,18 @@ Base path: `/antisocial/v1/`
 python manage.py test -v 2
 ```
 
-Test coverage includes:
+Coverage includes auth, feed, posts, comments, likes, follows, permissions, healthcheck, and request ID propagation.
 
-- API auth/register/login/JWT
-- Feed, posts, comments, likes, follows
-- Permissions and ownership rules
-- Healthcheck and request ID header presence
+---
 
-## CI pipeline
+## CI
 
-GitHub Actions workflow at `.github/workflows/ci.yml` runs on push/PR:
+GitHub Actions (`.github/workflows/ci.yml`) runs on every push and PR:
+1. Install dependencies
+2. Run migrations
+3. Run full test suite
 
-- install dependencies
-- run migrations
-- run test suite
-
-## Suggested next milestones
-
-- Add `pytest-cov` gate in CI (minimum coverage threshold).
-- Add Sentry for production error tracking.
-- Add Redis cache backend for production feed caching.
-- Ship a Next.js frontend consuming this API as a dedicated full-stack showcase.
+---
 
 ## License
 
