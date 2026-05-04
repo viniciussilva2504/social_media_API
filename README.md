@@ -40,7 +40,6 @@ Veja abaixo alguns prints de tela da aplicação web:
 - Frontend integration ready: REST API with schema/docs.
 - Engineering maturity: CI pipeline, request tracing, healthcheck, cache invalidation strategy.
 
-
 ## Core features
 
 - Authentication
