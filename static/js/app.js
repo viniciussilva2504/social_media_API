@@ -21,15 +21,39 @@ const FOOTER_QUOTES = [
   "life is happening outside this app",
   "the birds are singing, go listen",
   "your journal misses your handwriting",
+  "ant.social media for non-charismatic people",
 ];
+
+const BRAND_PHRASE = "ant.social media for non-charismatic people";
+const BRAND_HTML =
+  '<span style="color:#cc2200">a</span>' +
+  '<span style="color:#003d99">n</span>' +
+  '<span style="color:#c89610">t</span>' +
+  ".social media for non-charismatic people";
 
 function rotateHeroQuote() {
   const el = document.getElementById("hero-quote");
   if (!el) return;
-  const idx = Math.floor(Math.random() * FOOTER_QUOTES.length);
+  const idx = Math.floor(Math.random() * (FOOTER_QUOTES.length - 1)); // exclude brand phrase from hero
   el.style.opacity = 0;
   setTimeout(() => {
     el.textContent = FOOTER_QUOTES[idx];
+    el.style.opacity = 1;
+  }, 500);
+}
+
+function rotateFooterQuote() {
+  const el = document.getElementById("footer-quote");
+  if (!el) return;
+  const idx = Math.floor(Math.random() * FOOTER_QUOTES.length);
+  const quote = FOOTER_QUOTES[idx];
+  el.style.opacity = 0;
+  setTimeout(() => {
+    if (quote === BRAND_PHRASE) {
+      el.innerHTML = BRAND_HTML;
+    } else {
+      el.textContent = quote;
+    }
     el.style.opacity = 1;
   }, 500);
 }
@@ -38,6 +62,9 @@ function rotateHeroQuote() {
 document.addEventListener("DOMContentLoaded", () => {
   rotateHeroQuote();
   setInterval(rotateHeroQuote, 15000);
+
+  rotateFooterQuote();
+  setInterval(rotateFooterQuote, 12000);
 });
 
 // Character counter for post compose
@@ -49,7 +76,8 @@ function initCharCounter(textareaId, counterId, maxChars) {
   textarea.addEventListener("input", () => {
     const remaining = maxChars - textarea.value.length;
     counter.textContent = remaining;
-    counter.style.color = remaining < 20 ? "#c0392b" : "#aaa";
+    counter.style.color =
+      remaining < 10 ? "#cc2200" : remaining < 20 ? "#c89610" : "#aaa";
   });
 }
 

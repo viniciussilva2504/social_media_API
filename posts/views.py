@@ -7,6 +7,9 @@ from django.db.models import Count, Exists, OuterRef
 
 from posts.models import Post, Like, Comment
 
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
+
 
 @login_required
 def feed_view(request):
@@ -114,10 +117,6 @@ def delete_post_view(request, post_id):
         "is_liked": Like.objects.filter(user=request.user, post=post).exists(),
         "is_owner": True,
     })
-
-
-ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
-MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
 
 
 @login_required

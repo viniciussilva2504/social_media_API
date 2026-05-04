@@ -38,7 +38,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=80)
+    username = serializers.CharField(max_length=150)  # matches User.username max_length
     password = serializers.CharField()
 
     def validate(self, data):
