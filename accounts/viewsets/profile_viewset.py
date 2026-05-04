@@ -41,6 +41,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def get_object(self):
         if self.kwargs.get("username") == "me":
+            if not self.request.user.is_authenticated:
+                from rest_framework.exceptions import NotAuthenticated
+                raise NotAuthenticated()
             self.kwargs["username"] = self.request.user.username
         return super().get_object()
 

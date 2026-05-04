@@ -19,11 +19,18 @@ class CommentViewSet(viewsets.ModelViewSet):
             .order_by("created_at")
         )
         post_id = self.request.query_params.get("post_id")
-        if post_id:
+        if post_id is not None:
+            if not post_id.isdigit():
+                from rest_framework.exceptions import ValidationError
+                raise ValidationError({"post_id": "Must be a valid integer."})
             queryset = queryset.filter(post_id=post_id)
         return queryset
 
     def perform_create(self, serializer):
+        post = serializer.validated_data["post"]
+        if not post.is_active:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({"post": "Cannot comment on a deleted post."})
         check_toxicity(serializer.validated_data.get("content", ""))
         comment = serializer.save(author=self.request.user)
         invalidate_feed_for_author_and_followers(comment.post.author_id)
