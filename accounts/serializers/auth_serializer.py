@@ -5,9 +5,10 @@ from django.contrib.auth.password_validation import validate_password
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
-    password_confirm = serializers.CharField(write_only=True, min_length=8)
-    email = serializers.EmailField(required=False, allow_blank=True, max_length=80)
+    username = serializers.CharField(max_length=50)
+    password = serializers.CharField(write_only=True, min_length=8, max_length=50)
+    password_confirm = serializers.CharField(write_only=True, min_length=8, max_length=50)
+    email = serializers.EmailField(required=False, allow_blank=True, max_length=254)
 
     class Meta:
         model = User
@@ -20,6 +21,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         if value and User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with this email already exists.")
+        return value
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
         return value
 
     def validate(self, data):
@@ -38,8 +44,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)  # matches User.username max_length
-    password = serializers.CharField()
+    username = serializers.CharField(max_length=50)
+    password = serializers.CharField(max_length=50)
 
     def validate(self, data):
         user = authenticate(username=data["username"], password=data["password"])

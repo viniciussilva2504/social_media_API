@@ -10,11 +10,11 @@
     <div class="form-group">
       <label for="display_name">display name</label>
       <input type="text" id="display_name" name="display_name"
-             value="{{ profile.display_name }}" maxlength="100" />
+             value="{{ profile.display_name }}" maxlength="50" />
     </div>
     <div class="form-group">
       <label for="bio">bio</label>
-      <textarea id="bio" name="bio" maxlength="280" rows="3">{{ profile.bio }}</textarea>
+      <textarea id="bio" name="bio" maxlength="50" rows="3">{{ profile.bio }}</textarea>
     </div>
     <div class="form-group">
       <label for="profile_picture">profile picture</label>
@@ -26,7 +26,7 @@
     <div class="form-group">
       <label for="new_password">new password (optional)</label>
       <input type="password" id="new_password" name="new_password"
-             minlength="8" placeholder="leave blank to keep current" />
+             minlength="8" maxlength="50" placeholder="leave blank to keep current" />
     </div>
     <button type="submit" class="btn btn-primary" style="width: 100%">save changes</button>
   </form>

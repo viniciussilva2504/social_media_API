@@ -24,12 +24,24 @@ def home_view(request):
 def register_view(request):
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
-        email = request.POST.get("email", "").strip()[:80]
+        email = request.POST.get("email", "").strip()
         password = request.POST.get("password", "")
         password_confirm = request.POST.get("password_confirm", "")
 
         if not username or not password:
             messages.error(request, "Username and password are required.")
+            return render(request, "register.html")
+
+        if len(username) > 50:
+            messages.error(request, "Username must be at most 50 characters.")
+            return render(request, "register.html")
+
+        if len(password) > 50 or len(password_confirm) > 50:
+            messages.error(request, "Password fields must be at most 50 characters.")
+            return render(request, "register.html")
+
+        if email and len(email) > 254:
+            messages.error(request, "Email must be at most 254 characters.")
             return render(request, "register.html")
 
         if password != password_confirm:
@@ -62,6 +74,11 @@ def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username", "")
         password = request.POST.get("password", "")
+
+        if len(username) > 50 or len(password) > 50:
+            messages.error(request, "Username and password must be at most 50 characters.")
+            return render(request, "login.html")
+
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
@@ -120,6 +137,18 @@ def edit_profile_view(request, username):
         bio = request.POST.get("bio", "").strip()
         new_password = request.POST.get("new_password", "").strip()
         profile_picture = request.FILES.get("profile_picture")
+
+        if len(display_name) > 50:
+            messages.error(request, "Display name must be at most 50 characters.")
+            return render(request, "edit_profile.html", {"profile": profile})
+
+        if len(bio) > 50:
+            messages.error(request, "Bio must be at most 50 characters.")
+            return render(request, "edit_profile.html", {"profile": profile})
+
+        if len(new_password) > 50:
+            messages.error(request, "New password must be at most 50 characters.")
+            return render(request, "edit_profile.html", {"profile": profile})
 
         if display_name:
             profile.display_name = display_name

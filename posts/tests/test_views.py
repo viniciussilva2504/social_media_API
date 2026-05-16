@@ -96,3 +96,8 @@ class PostDetailViewTest(TestCase):
     def test_post_detail_not_found(self):
         resp = self.client.get("/post/99999/")
         self.assertEqual(resp.status_code, 404)
+
+    def test_comment_rejects_content_longer_than_50(self):
+        resp = self.client.post(f"/post/{self.post.pk}/", {"content": "x" * 51})
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(self.post.comments.exists())

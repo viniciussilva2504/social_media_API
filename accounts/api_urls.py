@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from accounts import viewsets
 
-router = routers.DefaultRouter()
+router = routers.SimpleRouter()
 router.register(r"register", viewsets.RegisterViewSet, basename="register")
 router.register(r"login", viewsets.LoginViewSet, basename="login")
 router.register(r"profile", viewsets.ProfileViewSet, basename="profile")

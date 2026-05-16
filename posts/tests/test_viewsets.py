@@ -145,6 +145,14 @@ class CommentViewSetTest(TestCase):
         resp = self.client.delete(f"/antisocial/v1/comment/{comment.id}/")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_create_comment_rejects_content_longer_than_50(self):
+        resp = self.client.post(
+            "/antisocial/v1/comment/",
+            {"post": self.post.id, "content": "x" * 51},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("content", resp.data)
+
 
 class LikeViewSetTest(TestCase):
     def setUp(self):

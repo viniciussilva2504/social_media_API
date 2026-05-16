@@ -48,6 +48,14 @@ def post_detail_view(request, post_id):
     if request.method == "POST":
         comment_content = request.POST.get("content", "").strip()
         if comment_content:
+            if len(comment_content) > 50:
+                messages.error(request, "Comment must be at most 50 characters.")
+                return render(request, "post_detail.html", {
+                    "post": post,
+                    "comments": comments,
+                    "is_liked": is_liked,
+                    "is_owner": request.user == post.author,
+                })
             Comment.objects.create(
                 author=request.user,
                 post=post,
