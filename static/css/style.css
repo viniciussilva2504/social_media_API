@@ -139,6 +139,15 @@ nav .logo:hover {
   text-transform: lowercase;
 }
 
+.logo-wordmark {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: #111;
+  margin-left: 10px;
+  text-transform: lowercase;
+}
+
 nav .nav-links {
   display: flex;
   gap: 24px;
@@ -192,8 +201,8 @@ main {
 
 .hero h1 {
   font-size: 72px;
-  font-weight: 800;
-  letter-spacing: -3px;
+  font-weight: 300;
+  letter-spacing: -1px;
   text-transform: lowercase;
 }
 
