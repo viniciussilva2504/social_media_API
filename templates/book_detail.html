@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} — ant.social{% endblock %}
+
+{% block content %}
+<div class="book-detail-header">
+  {% if book.cover %}
+  <div class="book-cover book-cover--large">
+    <img src="{{ book.cover.url }}" alt="cover of {{ book.title }}" />
+  </div>
+  {% else %}
+  <div class="book-cover book-cover--placeholder book-cover--large">
+    <span>{{ book.title.0 }}</span>
+  </div>
+  {% endif %}
+
+  <div class="book-detail-info">
+    <h1 class="book-detail-title">{{ book.title }}</h1>
+    <p class="book-detail-author">{{ book.book_author }}</p>
+    {% if book.description %}
+    <p class="book-detail-description">{{ book.description }}</p>
+    {% endif %}
+    <p class="book-detail-owner">
+      offered by <a href="{% url 'biblioteca' book.owner.username %}">@{{ book.owner.username }}</a>
+    </p>
+    {% if not book.is_available %}
+    <span class="book-badge book-badge--unavailable">already traded</span>
+    {% else %}
+    <span class="book-badge book-badge--available">available for trade</span>
+    {% endif %}
+
+    {% if is_own %}
+    <form method="post" action="{% url 'delete_book' book.id %}" style="margin-top: 16px;"
+          onsubmit="return confirm('Remove this book from your biblioteca?')">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-small">remove book</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if not is_own and book.is_available %}
+<div class="trade-request-section">
+  <h3 class="section-title">request a trade</h3>
+
+  {% if pending_request %}
+  <div class="trade-pending-notice">
+    <p>you already sent a trade request offering <strong>{{ pending_request.offered_book }}</strong>.</p>
+    <p class="timestamp">sent {{ pending_request.created_at|timesince }} ago</p>
+  </div>
+  {% elif user.is_authenticated %}
+  <form method="post" class="form-card">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="offered_book">i want to offer *</label>
+      <input type="text" id="offered_book" name="offered_book" maxlength="200" required
+             placeholder="title and author of the book you're offering" />
+    </div>
+    <div class="form-group">
+      <label for="message">message <span class="form-optional">(optional)</span></label>
+      <textarea id="message" name="message" maxlength="280" rows="2"
+                placeholder="any extra context for the trade..."></textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">send trade request</button>
+    </div>
+  </form>
+  {% else %}
+  <p><a href="{% url 'login' %}">login</a> to request a trade.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if is_own and trade_requests %}
+<div class="trade-requests-section">
+  <h3 class="section-title">pending trade requests</h3>
+  {% for tr in trade_requests %}
+  <div class="trade-request-card">
+    <div class="trade-request-info">
+      <p>
+        <a href="{% url 'profile' tr.requester.username %}">@{{ tr.requester.username }}</a>
+        wants to trade for <strong>{{ tr.offered_book }}</strong>
+      </p>
+      {% if tr.message %}
+      <p class="trade-message">"{{ tr.message }}"</p>
+      {% endif %}
+      <p class="timestamp">{{ tr.created_at|timesince }} ago</p>
+    </div>
+    <div class="trade-request-actions">
+      <form method="post" action="{% url 'respond_trade' tr.id 'accept' %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-small btn-primary">accept</button>
+      </form>
+      <form method="post" action="{% url 'respond_trade' tr.id 'decline' %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-small">decline</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
