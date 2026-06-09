@@ -35,7 +35,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False, min_length=8)
+    display_name = serializers.CharField(required=False, allow_blank=True, max_length=50)
+    bio = serializers.CharField(required=False, allow_blank=True, max_length=50)
+    password = serializers.CharField(write_only=True, required=False, min_length=8, max_length=50)
 
     class Meta:
         model = Profile

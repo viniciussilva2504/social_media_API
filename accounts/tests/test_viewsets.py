@@ -2,10 +2,12 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
+from django.core.cache import cache
 
 
 class RegisterViewSetTest(TestCase):
     def setUp(self):
+        cache.clear()
         self.client = APIClient()
 
     def test_register_success(self):
@@ -48,6 +50,28 @@ class RegisterViewSetTest(TestCase):
         resp = self.client.post("/antisocial/v1/register/", data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_register_allows_email_longer_than_50(self):
+        long_email = f"{'a' * 51}@example.com"
+        data = {
+            "username": "emailok",
+            "email": long_email,
+            "password": "strongpass123!",
+            "password_confirm": "strongpass123!",
+        }
+        resp = self.client.post("/antisocial/v1/register/", data)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(User.objects.filter(username="emailok", email=long_email).exists())
+
+    def test_register_rejects_username_longer_than_50(self):
+        data = {
+            "username": "u" * 51,
+            "password": "strongpass123!",
+            "password_confirm": "strongpass123!",
+        }
+        resp = self.client.post("/antisocial/v1/register/", data)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("username", resp.data)
+
 
 class LoginViewSetTest(TestCase):
     def setUp(self):
@@ -66,6 +90,18 @@ class LoginViewSetTest(TestCase):
         data = {"username": "testuser", "password": "wrongpass"}
         resp = self.client.post("/antisocial/v1/login/", data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_rejects_username_longer_than_50(self):
+        data = {"username": "u" * 51, "password": "testpass123!"}
+        resp = self.client.post("/antisocial/v1/login/", data)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("username", resp.data)
+
+    def test_login_rejects_password_longer_than_50(self):
+        data = {"username": "testuser", "password": "p" * 51}
+        resp = self.client.post("/antisocial/v1/login/", data)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("password", resp.data)
 
 
 class HealthcheckViewTest(TestCase):

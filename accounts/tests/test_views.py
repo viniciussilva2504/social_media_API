@@ -57,6 +57,28 @@ class RegisterViewTest(TestCase):
         })
         self.assertEqual(resp.status_code, 200)
 
+    def test_register_allows_email_longer_than_50(self):
+        long_email = f"{'a' * 51}@example.com"
+        resp = self.client.post("/register/", {
+            "username": "emailok",
+            "email": long_email,
+            "password": "strongpass123!",
+            "password_confirm": "strongpass123!",
+        })
+        self.assertRedirects(resp, "/feed/")
+        self.assertTrue(User.objects.filter(username="emailok", email=long_email).exists())
+
+    def test_register_rejects_username_longer_than_50(self):
+        resp = self.client.post("/register/", {
+            "username": "u" * 51,
+            "email": "new@example.com",
+            "password": "strongpass123!",
+            "password_confirm": "strongpass123!",
+        })
+        self.assertEqual(resp.status_code, 200)
+        messages = list(resp.context["messages"])
+        self.assertTrue(any("at most 50 characters" in str(m) for m in messages))
+
 
 class LoginViewTest(TestCase):
     def setUp(self):
@@ -81,6 +103,15 @@ class LoginViewTest(TestCase):
             "password": "wrongpass",
         })
         self.assertEqual(resp.status_code, 200)
+
+    def test_login_rejects_fields_longer_than_50(self):
+        resp = self.client.post("/login/", {
+            "username": "u" * 51,
+            "password": "testpass123!",
+        })
+        self.assertEqual(resp.status_code, 200)
+        messages = list(resp.context["messages"])
+        self.assertTrue(any("at most 50 characters" in str(m) for m in messages))
 
 
 class LogoutViewTest(TestCase):

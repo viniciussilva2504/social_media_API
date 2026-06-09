@@ -8,6 +8,7 @@ class CommentSerializer(serializers.ModelSerializer):
     author_display_name = serializers.CharField(
         source="author.profile.display_name", read_only=True
     )
+    content = serializers.CharField(max_length=50)
 
     class Meta:
         model = Comment
