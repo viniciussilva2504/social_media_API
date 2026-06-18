@@ -19,6 +19,8 @@ urlpatterns = [
     path("", include("accounts.urls")),
     path("antisocial/v1/", include("accounts.api_urls")),
     path("antisocial/v1/", include("posts.api_urls")),
+    path("antisocial/v1/", include("books.api_urls")),
+    path("", include("books.urls")),
     path("", include("posts.urls")),
     path("api-token-auth/", obtain_auth_token, name="api_token_auth"),
     path("health/", healthcheck, name="healthcheck"),

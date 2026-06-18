@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}biblioteca — @{{ profile_user.username }} — ant.social{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+  <h1>biblioteca</h1>
+  <p class="username-display">@{{ profile_user.username }}</p>
+  <div class="profile-actions" style="margin-top: 12px;">
+    <a href="{% url 'profile' profile_user.username %}" class="btn btn-small">← perfil</a>
+    {% if is_own %}
+    <a href="{% url 'add_book' username=profile_user.username %}" class="btn btn-small btn-primary">+ add book</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if books %}
+<div class="book-grid">
+  {% for book in books %}
+  <a href="{% url 'book_detail' book.id %}" class="book-card">
+    {% if book.cover %}
+    <div class="book-cover">
+      <img src="{{ book.cover.url }}" alt="cover of {{ book.title }}" />
+    </div>
+    {% else %}
+    <div class="book-cover book-cover--placeholder">
+      <span>{{ book.title.0 }}</span>
+    </div>
+    {% endif %}
+    <div class="book-info">
+      <p class="book-title">{{ book.title }}</p>
+      <p class="book-author-name">{{ book.book_author }}</p>
+      {% if not book.is_available %}
+      <span class="book-badge book-badge--unavailable">traded</span>
+      {% else %}
+      <span class="book-badge book-badge--available">available</span>
+      {% endif %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <p>no books here yet. probably still reading them.</p>
+  {% if is_own %}
+  <a href="{% url 'add_book' username=profile_user.username %}" class="btn btn-small btn-primary" style="margin-top: 16px;">+ add your first book</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

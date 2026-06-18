@@ -24,6 +24,7 @@
   </div>
 
   <div class="profile-actions">
+    <a href="{% url 'biblioteca' profile_user.username %}" class="btn btn-small">📚 biblioteca</a>
     {% if is_own_profile %}
     <a href="{% url 'edit_profile' profile_user.username %}" class="btn btn-small">edit profile</a>
     {% else %}
