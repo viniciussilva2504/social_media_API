@@ -61,6 +61,11 @@ The visual identity is intentionally minimal and typographic, Bauhaus-inspired: 
   <br/><sub>Swagger UI — OpenAPI 3 schema with full interactive docs at <code>/api/docs/</code></sub>
 </p>
 
+<p align="center">
+  <img src="img/book-detail.png" alt="Book detail — biblioteca book-trade example" width="680"/>
+  <br/><sub>Biblioteca — book detail with cover, description and trade status, e.g. "Para acabar de vez com Eddy Bellegueule" by Édouard Louis</sub>
+</p>
+
 ---
 
 ## Why this project matters
@@ -90,6 +95,11 @@ The visual identity is intentionally minimal and typographic, Bauhaus-inspired: 
 - Soft delete — posts are marked inactive, never dropped from the database
 - Likes (toggle) and threaded comments (full CRUD)
 
+**Biblioteca (book trading)**
+- Per-user book library with title, author, description and cover image
+- Book detail page with availability status and trade requests
+- Trade requests: send, accept or decline, owner-only actions
+
 **Feed**
 - Personalized feed: followed users + own posts, ordered chronologically
 - Response-level cache with per-user versioned keys
@@ -114,6 +124,8 @@ The visual identity is intentionally minimal and typographic, Bauhaus-inspired: 
 | `/followers/` · `/following/` | Social connections list |
 | `/search/` | Search users by username |
 | `/login/` · `/register/` | Authentication forms |
+| `/biblioteca/<username>/` | User's book library, add book |
+| `/book/<id>/` | Book detail, trade requests |
 
 ---
 
@@ -282,6 +294,13 @@ Interactive docs: [`/api/docs/`](https://ant-social.onrender.com/api/docs/)
 | `GET` | `/comment/?post_id={id}` | List comments |
 | `POST` | `/comment/` | Add comment |
 | `DELETE` | `/comment/{id}/` | Delete comment |
+
+### Biblioteca (books & trades)
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET/POST` | `/book/` | List / create books |
+| `GET/PATCH/DELETE` | `/book/{id}/` | Retrieve / edit / delete book |
+| `GET/POST` | `/trade-request/` | List / create trade requests |
 
 ### Docs & Health
 | Endpoint | Description |
