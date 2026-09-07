@@ -53,6 +53,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+if DEBUG:
+    # Local dev tools (VS Code "Responsive Viewer"/mobile-preview extensions,
+    # Live Preview, etc.) embed the app in an iframe from a different origin
+    # (e.g. vscode-webview://...) — X-Frame-Options: DENY blocks that
+    # unconditionally, even for editor tooling. Only ever relaxed in DEBUG;
+    # production keeps the clickjacking protection untouched.
+    MIDDLEWARE.remove("django.middleware.clickjacking.XFrameOptionsMiddleware")
+
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]

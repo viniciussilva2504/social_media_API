@@ -847,6 +847,20 @@ footer {
   color: #aaa;
 }
 
+.form-error {
+  color: var(--bauhaus-red);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.char-count {
+  display: block;
+  font-size: 12px;
+  color: #aaa;
+  text-align: right;
+  margin-top: 4px;
+}
+
 .trade-pending-notice {
   background: #fffde7;
   border: 1px solid #ffe082;

@@ -75,7 +75,7 @@ class ProfileMeUnauthenticatedTest(TestCase):
 
 
 class LoginUsernameMaxLengthTest(TestCase):
-    """BUG: LoginSerializer capped username at 80 chars; User model allows 150."""
+    """BUG: LoginSerializer capped username at 50 chars; User model allows 150."""
 
     def setUp(self):
         self.client = APIClient()

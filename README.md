@@ -99,6 +99,7 @@ The visual identity is intentionally minimal and typographic, Bauhaus-inspired: 
 - Per-user book library with title, author, description and cover image
 - Book detail page with availability status and trade requests
 - Trade requests: send, accept or decline, owner-only actions
+- Comments on each book, open to any authenticated user (owner included)
 
 **Feed**
 - Personalized feed: followed users + own posts, ordered chronologically
@@ -189,6 +190,8 @@ The visual identity is intentionally minimal and typographic, Bauhaus-inspired: 
 ---
 
 ## Quick start (local)
+
+> **Windows shortcut:** `.\dev.ps1 setup` (primeira vez) e depois `.\dev.ps1 run`. Também há `.\dev.ps1 docker`, `migrate`, `superuser` e `test`. Veja `dev.ps1` para detalhes.
 
 ```bash
 git clone https://github.com/viniciussilva2504/social_media_API.git
@@ -301,6 +304,9 @@ Interactive docs: [`/api/docs/`](https://ant-social.onrender.com/api/docs/)
 | `GET/POST` | `/book/` | List / create books |
 | `GET/PATCH/DELETE` | `/book/{id}/` | Retrieve / edit / delete book |
 | `GET/POST` | `/trade-request/` | List / create trade requests |
+| `GET` | `/book-comment/?book_id={id}` | List comments on a book |
+| `POST` | `/book-comment/` | Add comment |
+| `DELETE` | `/book-comment/{id}/` | Delete comment |
 
 ### Docs & Health
 | Endpoint | Description |

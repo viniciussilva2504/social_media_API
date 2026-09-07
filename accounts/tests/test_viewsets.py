@@ -91,8 +91,18 @@ class LoginViewSetTest(TestCase):
         resp = self.client.post("/antisocial/v1/login/", data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_login_rejects_username_longer_than_50(self):
-        data = {"username": "u" * 51, "password": "testpass123!"}
+    def test_login_accepts_username_up_to_150(self):
+        # 150 is auth.User.username's own max_length — a legitimate account
+        # created outside the public register flow (e.g. via createsuperuser)
+        # can have a username this long, and login must still work for it.
+        long_username = "u" * 150
+        User.objects.create_user(username=long_username, password="testpass123!")
+        data = {"username": long_username, "password": "testpass123!"}
+        resp = self.client.post("/antisocial/v1/login/", data)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_login_rejects_username_longer_than_150(self):
+        data = {"username": "u" * 151, "password": "testpass123!"}
         resp = self.client.post("/antisocial/v1/login/", data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("username", resp.data)

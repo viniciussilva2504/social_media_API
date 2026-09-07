@@ -5,30 +5,59 @@
 {% block content %}
 <h2 class="section-title">add a book</h2>
 
-<form method="post" enctype="multipart/form-data" class="form-card">
+<div class="form-card" style="background: #f5f5f5; margin-bottom: 20px">
+  <label for="import-url">import from a link <span class="form-optional">(optional — Amazon, Wook, Goodreads...)</span></label>
+  <div style="display: flex; gap: 8px">
+    <input type="url" id="import-url" placeholder="https://www.amazon.com/dp/..." style="flex: 1" />
+    <button type="button" id="import-btn" class="btn btn-small">fetch info</button>
+  </div>
+  <p class="form-optional" style="margin-top: 6px">
+    fills in the fields below from the page's preview data — review before saving. some sites block this; if it
+    fails, just fill the form in by hand.
+  </p>
+  <p class="form-error" id="import-error" style="display: none"></p>
+  <div id="import-preview" style="display: none; margin-top: 12px; align-items: center; gap: 12px">
+    <img id="import-preview-img" alt="" style="width: 60px; height: auto; border: 1px solid #ddd" />
+    <span id="import-preview-caption" style="font-size: 13px; color: #555"></span>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="form-card" id="add-book-form">
   {% csrf_token %}
 
   <div class="form-group">
     <label for="title">title *</label>
     <input type="text" id="title" name="title" maxlength="200" required
+           value="{{ form_data.title|default:'' }}"
            placeholder="e.g. The Left Hand of Darkness" />
   </div>
 
   <div class="form-group">
     <label for="book_author">author *</label>
     <input type="text" id="book_author" name="book_author" maxlength="200" required
+           value="{{ form_data.book_author|default:'' }}"
            placeholder="e.g. Ursula K. Le Guin" />
   </div>
 
   <div class="form-group">
     <label for="description">description <span class="form-optional">(optional)</span></label>
     <textarea id="description" name="description" maxlength="500" rows="3"
-              placeholder="edition, condition, notes..."></textarea>
+              placeholder="edition, condition, notes...">{{ form_data.description|default:'' }}</textarea>
+    <span class="char-count" id="description-counter">500</span>
   </div>
 
   <div class="form-group">
-    <label for="cover">cover image <span class="form-optional">(optional, max 5MB)</span></label>
+    <label for="cover">cover image *</label>
     <input type="file" id="cover" name="cover" accept=".jpg,.jpeg,.png,.webp" />
+    <p class="form-optional" style="margin-top: 6px">max 5MB — or paste a cover image URL below instead</p>
+  </div>
+
+  <div class="form-group">
+    <label for="cover_url">or cover image URL</label>
+    <input type="url" id="cover_url" name="cover_url"
+           value="{{ form_data.cover_url|default:'' }}"
+           placeholder="https://example.com/cover.jpg" />
+    <p class="form-error" id="cover-error" style="display: none">add a cover image or a cover image URL.</p>
   </div>
 
   <div class="form-actions">
@@ -36,4 +65,97 @@
     <a href="{% url 'biblioteca' username=request.user.username %}" class="btn">cancel</a>
   </div>
 </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  initCharCounter("description", "description-counter", 500);
+
+  (function () {
+    const form = document.getElementById("add-book-form");
+    const coverFile = document.getElementById("cover");
+    const coverUrl = document.getElementById("cover_url");
+    const coverError = document.getElementById("cover-error");
+
+    function hasCover() {
+      return (coverFile.files && coverFile.files.length > 0) || coverUrl.value.trim().length > 0;
+    }
+
+    form.addEventListener("submit", (e) => {
+      if (!hasCover()) {
+        e.preventDefault();
+        coverError.style.display = "block";
+        coverUrl.focus();
+      }
+    });
+
+    coverFile.addEventListener("change", () => {
+      if (hasCover()) coverError.style.display = "none";
+    });
+    coverUrl.addEventListener("input", () => {
+      if (hasCover()) coverError.style.display = "none";
+    });
+  })();
+
+  (function () {
+    const importUrl = document.getElementById("import-url");
+    const importBtn = document.getElementById("import-btn");
+    const importError = document.getElementById("import-error");
+    const importPreview = document.getElementById("import-preview");
+    const importPreviewImg = document.getElementById("import-preview-img");
+    const importPreviewCaption = document.getElementById("import-preview-caption");
+
+    const titleInput = document.getElementById("title");
+    const authorInput = document.getElementById("book_author");
+    const descriptionInput = document.getElementById("description");
+    const coverUrlInput = document.getElementById("cover_url");
+
+    importBtn.addEventListener("click", async () => {
+      const url = importUrl.value.trim();
+      importError.style.display = "none";
+      importPreview.style.display = "none";
+      if (!url) {
+        importError.textContent = "paste a link first.";
+        importError.style.display = "block";
+        return;
+      }
+
+      importBtn.disabled = true;
+      importBtn.textContent = "fetching...";
+      const csrftoken = getCookie("csrftoken");
+      try {
+        const resp = await fetch("{% url 'import_book_preview' %}", {
+          method: "POST",
+          headers: { "X-CSRFToken": csrftoken, "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ url }),
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.ok) {
+          throw new Error(data.error || "could not import from that link.");
+        }
+
+        if (data.title) titleInput.value = data.title;
+        if (data.author) authorInput.value = data.author;
+        if (data.description) descriptionInput.value = data.description;
+        if (data.cover_image_url) {
+          coverUrlInput.value = data.cover_image_url;
+          importPreviewImg.src = data.cover_image_url;
+          importPreviewCaption.textContent = "cover preview — double-check it's the right edition";
+          importPreview.style.display = "flex";
+        }
+
+        // refresh the live char counter + cover-required indicator
+        descriptionInput.dispatchEvent(new Event("input"));
+        coverUrlInput.dispatchEvent(new Event("input"));
+      } catch (err) {
+        importError.textContent = err.message;
+        importError.style.display = "block";
+      } finally {
+        importBtn.disabled = false;
+        importBtn.textContent = "fetch info";
+      }
+    });
+  })();
+</script>
 {% endblock %}
