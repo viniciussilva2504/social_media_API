@@ -3,6 +3,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from accounts.models.profile import Profile
 
 
 class RegisterViewSetTest(TestCase):
@@ -91,8 +92,19 @@ class LoginViewSetTest(TestCase):
         resp = self.client.post("/antisocial/v1/login/", data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_login_rejects_username_longer_than_50(self):
-        data = {"username": "u" * 51, "password": "testpass123!"}
+    def test_login_accepts_username_up_to_150(self):
+        # 150 is auth.User.username's own max_length; accounts created outside
+        # the public register flow (e.g. createsuperuser) can use it.
+        long_username = "u" * 150
+        user = User.objects.create_user(username=long_username, password="testpass123!")
+        # The post_save signal must still create a profile for long usernames.
+        self.assertTrue(Profile.objects.filter(user=user).exists())
+        data = {"username": long_username, "password": "testpass123!"}
+        resp = self.client.post("/antisocial/v1/login/", data)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_login_rejects_username_longer_than_150(self):
+        data = {"username": "u" * 151, "password": "testpass123!"}
         resp = self.client.post("/antisocial/v1/login/", data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("username", resp.data)

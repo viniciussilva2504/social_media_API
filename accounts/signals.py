@@ -15,6 +15,11 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
-                Profile.objects.create(user=instance, display_name=instance.username)
+                # User.username allows 150 chars but Profile.display_name only
+                # 100; truncate so long usernames still get a profile.
+                max_len = Profile._meta.get_field("display_name").max_length
+                Profile.objects.create(
+                    user=instance, display_name=instance.username[:max_len]
+                )
         except Exception:
             logger.exception("Failed to create profile for user %s", instance.username)

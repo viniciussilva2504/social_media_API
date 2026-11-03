@@ -2,14 +2,12 @@
 Security & regression tests for known bugs.
 Run: pytest tests/test_bugs.py -v
 """
-import pytest
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 
 from posts.models import Post, Comment
-from accounts.models import Follow
 
 
 class CommentOnInactivePostTest(TestCase):
@@ -75,7 +73,7 @@ class ProfileMeUnauthenticatedTest(TestCase):
 
 
 class LoginUsernameMaxLengthTest(TestCase):
-    """BUG: LoginSerializer capped username at 80 chars; User model allows 150."""
+    """BUG: LoginSerializer capped username at 50 chars; User model allows 150."""
 
     def setUp(self):
         self.client = APIClient()

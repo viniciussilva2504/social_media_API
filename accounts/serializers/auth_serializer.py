@@ -44,7 +44,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=50)
+    # 150 matches auth.User.username's own max_length: login must accept any
+    # username that can exist in the DB, including accounts created outside the
+    # public register flow (admin, createsuperuser); registration is capped at 50.
+    username = serializers.CharField(max_length=150)
     password = serializers.CharField(max_length=50)
 
     def validate(self, data):
